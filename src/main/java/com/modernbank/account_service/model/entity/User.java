@@ -1,0 +1,77 @@
+package com.modernbank.account_service.model.entity;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.modernbank.account_service.model.enums.Role;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.List;
+import java.util.Set;
+
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+
+public class User implements UserDetails {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column
+    private String id;
+
+    @Column(name = "tckn", nullable = false)
+    private String tckn;
+
+    @Column(name = "firstName", nullable = false)
+    private String firstName;
+
+    @Column(name = "secondName", nullable = false)
+    private String secondName;
+
+    @Column(name = "lastName", nullable = false)
+    private String lastName;
+
+    @Column(name = "email", nullable = false)
+    private String email;
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @Column(name = "gsm", nullable = false)
+    private String gsm;
+
+    @Column(name = "datofbirth", nullable = false)
+    private String dateOfBirth;
+
+    private boolean isAccountNonExpired;
+
+    private boolean isAccountNonLocked;
+
+    private boolean isCredentialsNonExpired;
+
+    private boolean isEnabled;
+
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @JoinTable(name = "authorities",  joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    private Set<Role> authorities;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<Account> accounts;
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public String getPassword(){
+        return password;
+    }
+}

@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: account-service
+  data:
+  datasource:
+    url: jdbc:mysql://localhost:3306/modern_bank_account_service
+    username: springstudent
+    password: springstudent
+  jpa:
+    hibernate:
+      ddl-auto: update
+  main:
+    banner-mode: off
