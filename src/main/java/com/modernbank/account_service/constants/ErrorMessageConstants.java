@@ -31,4 +31,16 @@ public class ErrorMessageConstants {
     public static final String FIRST_NAME_NOT_VALID = "First name is not valid";
 
     public static final String LAST_NAME_NOT_VALID = "Last name is not valid";
+
+    public static final String CURRENCY_NOT_VALID = "Currency is not valid";
+
+    public static final String CURRENCY_NOT_BLANK = "Currency must be written";
+
+    public static final String STRING_NOT_BLANK = "The input must be written";
+
+    public static final String STRING_NOT_VALID = "The input is not valid";
+
+    public static final String ACCOUNT_NAME_NOT_VALID = "Account name is not valid";
+
+    public static final String ACCOUNT_NAME_NOT_BLANK = "Account name must be written";
 }

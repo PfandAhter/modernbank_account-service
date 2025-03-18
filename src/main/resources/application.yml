@@ -1,3 +1,10 @@
+cache:
+  refresh:
+    cron: 0 0 1 * * SUN # every day at 1 AM
+  user:
+    cleanup:
+      rate: 43200000 # 12 hours
+
 spring:
   application:
     name: account-service
@@ -9,5 +16,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  cache:
+    type: redis
+    redis:
+      host: localhost
+      port: 6379
   main:
     banner-mode: off
