@@ -1,5 +1,4 @@
-package com.modernbank.account_service.api.response;
-
+package com.modernbank.account_service.rest.controller.api.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

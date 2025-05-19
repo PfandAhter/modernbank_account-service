@@ -43,4 +43,20 @@ public class ErrorMessageConstants {
     public static final String ACCOUNT_NAME_NOT_VALID = "Account name is not valid";
 
     public static final String ACCOUNT_NAME_NOT_BLANK = "Account name must be written";
+
+    public static final String BRANCH_NAME_NOT_VALID = "Branch name is not valid";
+
+    public static final String BRANCH_NAME_NOT_BLANK = "Branch name must be written";
+
+    public static final String ADDRESS_NOT_VALID = "Address is not valid";
+
+    public static final String ADDRESS_NOT_BLANK = "Address must be written";
+
+    public static final String CITY_NOT_VALID = "City is not valid";
+
+    public static final String CITY_NOT_BLANK = "City must be written";
+
+    public static final String COUNTRY_NOT_VALID = "Country is not valid";
+
+    public static final String COUNTRY_NOT_BLANK = "Country must be written";
 }

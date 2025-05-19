@@ -7,4 +7,6 @@ import java.util.List;
 public interface IAccountCacheService {
 
     List<AccountDTO> getAccountsByUserId(String userId);
+
+    void refreshAccountsByUserId();
 }

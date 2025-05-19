@@ -1,4 +1,4 @@
-package com.modernbank.account_service.api.request;
+package com.modernbank.account_service.rest.controller.api.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -15,4 +15,7 @@ public class BaseRequest {
     private LocalDateTime time = LocalDateTime.now();
 
     private String token;
+
+    @JsonIgnore
+    private String userId;
 }

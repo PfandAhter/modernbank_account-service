@@ -1,9 +1,8 @@
 package com.modernbank.account_service.exception;
 
-import com.modernbank.account_service.api.response.ErrorResponse;
+import com.modernbank.account_service.rest.controller.api.response.ErrorResponse;
 import com.modernbank.account_service.model.dto.ErrorCodesDTO;
 import com.modernbank.account_service.rest.service.IMapperService;
-import com.modernbank.account_service.rest.service.cache.ICacheService;
 import com.modernbank.account_service.rest.service.cache.error.IErrorCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(createErrorNotFoundResponseBody(e.getMessage(),HttpStatus.NOT_ACCEPTABLE));
     }
 
-
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public ResponseEntity<ErrorResponse> handleException(Exception e){
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(createFailResponseBody(e.getMessage(),HttpStatus.NOT_ACCEPTABLE));
+    }
 
     private ErrorResponse createErrorNotFoundResponseBody(String exceptionMessage, HttpStatus status){
         log.error("Error message: {}", exceptionMessage);
@@ -49,7 +52,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorCodesDTO errorCodesDTO = findByErrorCode(exceptionMessage);
         return new ErrorResponse(status, errorCodesDTO.getError(), errorCodesDTO.getDescription(), LocalDateTime.now());
     }
-
 
     private ErrorCodesDTO findByErrorCode(String errorId) {
         return mapperService.map(errorCacheService.getErrorCode(errorId), ErrorCodesDTO.class);

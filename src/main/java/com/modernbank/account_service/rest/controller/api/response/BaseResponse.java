@@ -1,4 +1,4 @@
-package com.modernbank.account_service.api.response;
+package com.modernbank.account_service.rest.controller.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

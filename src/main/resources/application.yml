@@ -1,6 +1,7 @@
 cache:
   refresh:
-    cron: 0 0 1 * * SUN # every day at 1 AM
+    cronErrorCode: 0 0 1 * * SUN # every day at 1 AM
+    accounts: 0 */5 * * * * # every 5 minutes
   user:
     cleanup:
       rate: 43200000 # 12 hours
@@ -23,3 +24,5 @@ spring:
       port: 6379
   main:
     banner-mode: off
+server:
+  port: 8081

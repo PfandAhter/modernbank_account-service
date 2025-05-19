@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ public class User implements UserDetails {
     @Column(name = "firstName", nullable = false)
     private String firstName;
 
-    @Column(name = "secondName", nullable = false)
+    @Column(name = "secondName", nullable = true)
     private String secondName;
 
     @Column(name = "lastName", nullable = false)
@@ -47,6 +48,12 @@ public class User implements UserDetails {
 
     @Column(name = "datofbirth", nullable = false)
     private String dateOfBirth;
+
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
 
     private boolean isAccountNonExpired;
 
