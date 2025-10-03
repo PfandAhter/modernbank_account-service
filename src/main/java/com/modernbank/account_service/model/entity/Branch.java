@@ -1,8 +1,7 @@
 package com.modernbank.account_service.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,6 +10,9 @@ import java.util.List;
 @Entity
 @Table(name = "branch")
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Branch {
 
     @Id

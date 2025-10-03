@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class ValidStringValidator implements ConstraintValidator<ValidString,String> {
 
-    private final Pattern STRING_REGEX = Pattern.compile("^[a-zA-Z]+$");
+    private final Pattern STRING_REGEX = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z]).{0,255}$");
 
     @Override
     public boolean isValid(String string, ConstraintValidatorContext context) {
