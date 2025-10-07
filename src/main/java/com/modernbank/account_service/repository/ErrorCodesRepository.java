@@ -1,6 +1,6 @@
 package com.modernbank.account_service.repository;
 
-import com.modernbank.account_service.model.entity.ErrorCodes;
+import com.modernbank.account_service.entity.ErrorCodes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

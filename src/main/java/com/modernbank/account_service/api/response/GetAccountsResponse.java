@@ -1,6 +1,6 @@
-package com.modernbank.account_service.rest.controller.api.response;
+package com.modernbank.account_service.api.response;
 
-import com.modernbank.account_service.model.dto.AccountDTO;
+import com.modernbank.account_service.api.dto.AccountDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

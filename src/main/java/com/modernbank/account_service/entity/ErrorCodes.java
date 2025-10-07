@@ -1,4 +1,4 @@
-package com.modernbank.account_service.model.entity;
+package com.modernbank.account_service.entity;
 
 
 import jakarta.persistence.Column;

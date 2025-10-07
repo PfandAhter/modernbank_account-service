@@ -1,4 +1,4 @@
-package com.modernbank.account_service.rest.controller.api.request;
+package com.modernbank.account_service.api.request;
 
 import com.modernbank.account_service.validator.annotations.ValidString;
 import jakarta.validation.constraints.NotBlank;
@@ -10,12 +10,6 @@ import static com.modernbank.account_service.constants.ErrorMessageConstants.BRA
 
 import static com.modernbank.account_service.constants.ErrorMessageConstants.ADDRESS_NOT_BLANK;
 import static com.modernbank.account_service.constants.ErrorMessageConstants.ADDRESS_NOT_VALID;
-
-import static com.modernbank.account_service.constants.ErrorMessageConstants.CITY_NOT_BLANK;
-import static com.modernbank.account_service.constants.ErrorMessageConstants.CITY_NOT_VALID;
-
-import static com.modernbank.account_service.constants.ErrorMessageConstants.COUNTRY_NOT_BLANK;
-import static com.modernbank.account_service.constants.ErrorMessageConstants.COUNTRY_NOT_VALID;
 
 
 @Getter
@@ -31,11 +25,11 @@ public class CreateBranchRequest extends BaseRequest{
     @NotBlank(message = ADDRESS_NOT_BLANK)
     private String address;
 
-    @ValidString(message = CITY_NOT_VALID)
-    @NotBlank(message = CITY_NOT_BLANK)
-    private String city;
+//    @ValidString(message = CITY_NOT_VALID)
+//    @NotBlank(message = CITY_NOT_BLANK)
+    private Long cityId;
 
-    @ValidString(message = COUNTRY_NOT_VALID)
-    @NotBlank(message = COUNTRY_NOT_BLANK)
-    private String country;
+//    @ValidString(message = COUNTRY_NOT_VALID)
+//    @NotBlank(message = COUNTRY_NOT_BLANK)
+    private Long districtId;
 }

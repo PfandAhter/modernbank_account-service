@@ -1,9 +1,8 @@
 package com.modernbank.account_service.repository;
 
-import com.modernbank.account_service.model.entity.Account;
+import com.modernbank.account_service.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.keyvalue.repository.config.QueryCreatorType;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

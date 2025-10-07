@@ -1,10 +1,13 @@
-package com.modernbank.account_service.rest.service.user;
+package com.modernbank.account_service.rest.service.impl;
 
-import com.modernbank.account_service.model.entity.User;
+import com.modernbank.account_service.entity.User;
+import com.modernbank.account_service.exception.NotFoundException;
+import com.modernbank.account_service.model.GetUserModel;
 import com.modernbank.account_service.model.enums.Role;
 import com.modernbank.account_service.repository.UserRepository;
-import com.modernbank.account_service.rest.controller.api.request.CreateUserRequest;
-import com.modernbank.account_service.rest.controller.api.response.BaseResponse;
+import com.modernbank.account_service.api.request.CreateUserRequest;
+import com.modernbank.account_service.api.response.BaseResponse;
+import com.modernbank.account_service.rest.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
@@ -18,7 +21,7 @@ import java.util.HashSet;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl implements IUserService{
+public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;
 
@@ -51,5 +54,16 @@ public class UserServiceImpl implements IUserService{
     }
 
 
+    public GetUserModel getUserInfo(String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
 
+        return GetUserModel.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .secondName(user.getSecondName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .build();
+    }
 }

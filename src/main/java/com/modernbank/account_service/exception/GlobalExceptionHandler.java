@@ -1,7 +1,7 @@
 package com.modernbank.account_service.exception;
 
-import com.modernbank.account_service.rest.controller.api.response.ErrorResponse;
-import com.modernbank.account_service.model.dto.ErrorCodesDTO;
+import com.modernbank.account_service.api.response.ErrorResponse;
+import com.modernbank.account_service.api.dto.ErrorCodesDTO;
 import com.modernbank.account_service.rest.service.IMapperService;
 import com.modernbank.account_service.rest.service.cache.error.IErrorCacheService;
 import lombok.RequiredArgsConstructor;

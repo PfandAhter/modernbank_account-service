@@ -1,7 +1,7 @@
 package com.modernbank.account_service.rest.service.cache.error;
 
 import com.modernbank.account_service.exception.ErrorCodesNotFoundException;
-import com.modernbank.account_service.model.entity.ErrorCodes;
+import com.modernbank.account_service.entity.ErrorCodes;
 import com.modernbank.account_service.repository.ErrorCodesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

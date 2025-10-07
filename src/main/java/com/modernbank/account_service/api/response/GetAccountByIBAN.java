@@ -1,4 +1,4 @@
-package com.modernbank.account_service.rest.controller.api.response;
+package com.modernbank.account_service.api.response;
 
 import com.modernbank.account_service.model.enums.AccountStatus;
 import com.modernbank.account_service.model.enums.Currency;
@@ -11,6 +11,8 @@ import lombok.Setter;
 @Builder
 
 public class    GetAccountByIBAN extends BaseResponse{
+
+    private String accountId;
 
     private String userId;
 

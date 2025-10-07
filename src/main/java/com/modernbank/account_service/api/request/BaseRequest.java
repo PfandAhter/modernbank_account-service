@@ -1,4 +1,4 @@
-package com.modernbank.account_service.rest.controller.api.request;
+package com.modernbank.account_service.api.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;

@@ -1,19 +1,20 @@
-package com.modernbank.account_service.rest.service.account;
+package com.modernbank.account_service.rest.service.impl;
 
 import com.modernbank.account_service.exception.NotFoundException;
 import com.modernbank.account_service.repository.UserRepository;
-import com.modernbank.account_service.rest.controller.api.request.BaseRequest;
-import com.modernbank.account_service.rest.controller.api.request.CreateAccountRequest;
-import com.modernbank.account_service.rest.controller.api.response.BaseResponse;
-import com.modernbank.account_service.model.entity.Account;
-import com.modernbank.account_service.model.entity.Branch;
-import com.modernbank.account_service.model.entity.User;
+import com.modernbank.account_service.api.request.BaseRequest;
+import com.modernbank.account_service.api.request.CreateAccountRequest;
+import com.modernbank.account_service.api.response.BaseResponse;
+import com.modernbank.account_service.entity.Account;
+import com.modernbank.account_service.entity.Branch;
+import com.modernbank.account_service.entity.User;
 import com.modernbank.account_service.model.enums.AccountStatus;
 import com.modernbank.account_service.repository.AccountRepository;
 import com.modernbank.account_service.repository.BranchRepository;
-import com.modernbank.account_service.rest.controller.api.response.GetAccountByIBAN;
-import com.modernbank.account_service.rest.controller.api.response.GetAccountOwnerNameResponse;
-import com.modernbank.account_service.rest.controller.api.response.GetAccountsResponse;
+import com.modernbank.account_service.api.response.GetAccountByIBAN;
+import com.modernbank.account_service.api.response.GetAccountOwnerNameResponse;
+import com.modernbank.account_service.api.response.GetAccountsResponse;
+import com.modernbank.account_service.rest.service.IAccountService;
 import com.modernbank.account_service.rest.service.cache.account.IAccountCacheService;
 import com.modernbank.account_service.util.IbanGenerationService;
 import lombok.RequiredArgsConstructor;
@@ -86,6 +87,7 @@ public class AccountServiceImpl implements IAccountService {
     public GetAccountsResponse getAccountsByUser(BaseRequest request){
         User user = userRepository.findByUserId("6bb91e57-032c-40db-b6ce-4e3ef459c3a0") //TODO: Burasi tokenden extract edilicek...
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+//        accountCacheService.refreshAccountsByUserId();
 
         return GetAccountsResponse.builder()
                 .firstName(user.getFirstName())
@@ -104,6 +106,7 @@ public class AccountServiceImpl implements IAccountService {
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
 
         return GetAccountByIBAN.builder()
+                .accountId(account.getId())
                 .userId(user.getId())
                 .firstName(user.getFirstName())
                 .secondName(user.getSecondName())

@@ -1,11 +1,11 @@
-package com.modernbank.account_service.rest.controller.api;
+package com.modernbank.account_service.api;
 
-import com.modernbank.account_service.rest.controller.api.request.BaseRequest;
-import com.modernbank.account_service.rest.controller.api.request.CreateAccountRequest;
-import com.modernbank.account_service.rest.controller.api.response.BaseResponse;
-import com.modernbank.account_service.rest.controller.api.response.GetAccountByIBAN;
-import com.modernbank.account_service.rest.controller.api.response.GetAccountOwnerNameResponse;
-import com.modernbank.account_service.rest.controller.api.response.GetAccountsResponse;
+import com.modernbank.account_service.api.request.BaseRequest;
+import com.modernbank.account_service.api.request.CreateAccountRequest;
+import com.modernbank.account_service.api.response.BaseResponse;
+import com.modernbank.account_service.api.response.GetAccountByIBAN;
+import com.modernbank.account_service.api.response.GetAccountOwnerNameResponse;
+import com.modernbank.account_service.api.response.GetAccountsResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

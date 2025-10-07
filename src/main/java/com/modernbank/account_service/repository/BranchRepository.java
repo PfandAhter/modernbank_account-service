@@ -15,6 +15,6 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
     @Query("SELECT b FROM Branch b WHERE b.id = ?1")
     Optional<Branch> findBranchById(Long id);
 
-    @Query("SELECT DISTINCT b.district.city FROM Branch b WHERE b.active =1")
+    @Query("SELECT DISTINCT b.district.city FROM Branch b WHERE b.status = 'ACTIVE'")
     Optional<List<City>> findCitiesWithActiveBranches();
 }

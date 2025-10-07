@@ -1,4 +1,4 @@
-package com.modernbank.account_service.model.entity;
+package com.modernbank.account_service.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.modernbank.account_service.model.enums.Role;
@@ -68,7 +68,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> authorities;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Account> accounts;
 

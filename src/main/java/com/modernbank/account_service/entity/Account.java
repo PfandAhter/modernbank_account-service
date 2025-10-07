@@ -1,4 +1,4 @@
-package com.modernbank.account_service.model.entity;
+package com.modernbank.account_service.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.modernbank.account_service.model.enums.AccountStatus;
@@ -36,12 +36,12 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id")
     private Branch branch;
 

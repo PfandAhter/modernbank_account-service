@@ -1,4 +1,4 @@
-package com.modernbank.account_service.model.dto;
+package com.modernbank.account_service.api.dto;
 
 import com.modernbank.account_service.model.enums.Currency;
 import lombok.Getter;
@@ -8,6 +8,8 @@ import lombok.Setter;
 @Setter
 
 public class AccountDTO {
+
+    private String id;
 
     private String iban;
 

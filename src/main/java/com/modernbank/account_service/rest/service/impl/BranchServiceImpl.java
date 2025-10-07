@@ -48,7 +48,8 @@ public class BranchServiceImpl implements IBranchService {
     }
 
     public List<CityModel> getAllCities(){
-        return branchCacheService.getCities();
+        return null; // TODO: enable when cache is ready
+//        return branchCacheService.getCities();
     }
 
     public List<DistrictModel> getDistrictsByCityId(Long cityId){
