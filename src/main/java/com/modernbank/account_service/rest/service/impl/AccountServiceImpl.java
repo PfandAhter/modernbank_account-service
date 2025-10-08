@@ -1,6 +1,7 @@
 package com.modernbank.account_service.rest.service.impl;
 
 import com.modernbank.account_service.exception.NotFoundException;
+import com.modernbank.account_service.model.AccountListModel;
 import com.modernbank.account_service.repository.UserRepository;
 import com.modernbank.account_service.api.request.BaseRequest;
 import com.modernbank.account_service.api.request.CreateAccountRequest;
@@ -84,16 +85,16 @@ public class AccountServiceImpl implements IAccountService {
     }*/
 
     @Override
-    public GetAccountsResponse getAccountsByUser(BaseRequest request){
+    public AccountListModel getAccountsByUser(String userId){
         User user = userRepository.findByUserId("6bb91e57-032c-40db-b6ce-4e3ef459c3a0") //TODO: Burasi tokenden extract edilicek...
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
 //        accountCacheService.refreshAccountsByUserId();
 
-        return GetAccountsResponse.builder()
+        return AccountListModel.builder()
                 .firstName(user.getFirstName())
                 .secondName(user.getSecondName())
                 .lastName(user.getLastName())
-                .accounts(accountCacheService.getAccountsByUserId("6bb91e57-032c-40db-b6ce-4e3ef459c3a0"))
+                .accounts(accountCacheService.getAccountsByUserId(user.getId()))
                 .build();
     }//TODO: Buraya simdilik kendi useridmi yazdim bunu dinamiklestirirsin. Birde calisiyor mu test et...
 

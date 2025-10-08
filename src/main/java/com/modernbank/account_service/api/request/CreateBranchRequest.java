@@ -25,10 +25,6 @@ public class CreateBranchRequest extends BaseRequest{
     @NotBlank(message = ADDRESS_NOT_BLANK)
     private String address;
 
-//    @ValidString(message = CITY_NOT_VALID)
-//    @NotBlank(message = CITY_NOT_BLANK)
-    private Long cityId;
-
 //    @ValidString(message = COUNTRY_NOT_VALID)
 //    @NotBlank(message = COUNTRY_NOT_BLANK)
     private Long districtId;

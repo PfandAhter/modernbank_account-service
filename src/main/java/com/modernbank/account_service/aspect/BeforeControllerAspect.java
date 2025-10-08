@@ -1,7 +1,7 @@
 package com.modernbank.account_service.aspect;
 
 
-import com.modernbank.account_service.rest.controller.api.request.BaseRequest;
+import com.modernbank.account_service.api.request.BaseRequest;
 import com.modernbank.account_service.rest.service.IHeaderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

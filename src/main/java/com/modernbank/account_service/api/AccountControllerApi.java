@@ -6,19 +6,17 @@ import com.modernbank.account_service.api.response.BaseResponse;
 import com.modernbank.account_service.api.response.GetAccountByIBAN;
 import com.modernbank.account_service.api.response.GetAccountOwnerNameResponse;
 import com.modernbank.account_service.api.response.GetAccountsResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 public interface AccountControllerApi {
 
     @PostMapping(path = "/create", produces = "application/json", consumes = "application/json")
     ResponseEntity<BaseResponse> createAccount(@RequestBody CreateAccountRequest createAccountRequest);
 
-    @PostMapping(path = "/get")
-    ResponseEntity<GetAccountsResponse> getAccounts(@RequestBody BaseRequest baseRequest);
+    @GetMapping(path = "/get")
+    GetAccountsResponse getAccounts(@RequestHeader("X-User-Id") String userId, HttpServletRequest request);
 
     @GetMapping(path = "/get-by-iban")
     ResponseEntity<GetAccountByIBAN> getAccountByIBAN(@RequestParam(value = "iban") String iban);

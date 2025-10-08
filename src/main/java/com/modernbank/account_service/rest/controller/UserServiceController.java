@@ -2,17 +2,15 @@ package com.modernbank.account_service.rest.controller;
 
 import com.modernbank.account_service.api.UserControllerApi;
 import com.modernbank.account_service.api.dto.GetUserDTO;
-import com.modernbank.account_service.api.dto.UserDTO;
 import com.modernbank.account_service.api.request.CreateUserRequest;
 import com.modernbank.account_service.api.request.UpdateUserRequest;
 import com.modernbank.account_service.api.response.BaseResponse;
 import com.modernbank.account_service.api.response.GetUserInfoResponse;
-import com.modernbank.account_service.rest.service.IMapperService;
+import com.modernbank.account_service.rest.service.MapperService;
 import com.modernbank.account_service.rest.service.IUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,7 +21,7 @@ public class UserServiceController implements UserControllerApi {
 
     private final IUserService userService;
 
-    private final IMapperService mapperService;
+    private final MapperService mapperService;
 
     @Override
     public ResponseEntity<BaseResponse> createUser(CreateUserRequest createUserRequest) {
