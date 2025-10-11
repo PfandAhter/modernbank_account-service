@@ -38,6 +38,11 @@ public class AccountServiceController implements AccountControllerApi {
     }
 
     @Override
+    public GetAccountsResponse getAccountsV2(BaseRequest baseRequest) {
+        return mapperService.map(accountService.getAccountsByUser(baseRequest.getUserId()), GetAccountsResponse.class);
+    }
+
+    @Override
     public ResponseEntity<GetAccountByIBAN> getAccountByIBAN(String iban) {
         return ResponseEntity.ok(accountService.getAccountByIBAN(iban));
     }

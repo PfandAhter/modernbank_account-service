@@ -18,6 +18,9 @@ public interface AccountControllerApi {
     @GetMapping(path = "/get")
     GetAccountsResponse getAccounts(@RequestHeader("X-User-Id") String userId, HttpServletRequest request);
 
+    @PostMapping(path = "/getv2")
+    GetAccountsResponse getAccountsV2(@RequestBody BaseRequest baseRequest);
+
     @GetMapping(path = "/get-by-iban")
     ResponseEntity<GetAccountByIBAN> getAccountByIBAN(@RequestParam(value = "iban") String iban);
 
