@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
+import static com.modernbank.account_service.constants.ErrorCodeConstants.*;
+
 @Service
 @RequiredArgsConstructor
 
@@ -46,7 +48,7 @@ public class CityDistrictServiceImpl implements CityDistrictService {
     @Override
     public void createDistrict(CreateDistrictRequest request) {
         City city = cityRepository.findById(request.getCityId())
-                .orElseThrow(() -> new NotFoundException("City not found"));
+                .orElseThrow(() -> new NotFoundException(CITY_NOT_FOUND));
 
         districtRepository.save(District.builder()
                 .city(city)
@@ -59,7 +61,7 @@ public class CityDistrictServiceImpl implements CityDistrictService {
     @Override
     public void updateDistrict(UpdateDistrictRequest request) {
         District district = districtRepository.findById(request.getId())
-                .orElseThrow(() -> new NotFoundException("District not found"));
+                .orElseThrow(() -> new NotFoundException(DISTRICT_NOT_FOUND));
 
         if (request.getName() != null) {
             district.setName(request.getName());
@@ -72,7 +74,7 @@ public class CityDistrictServiceImpl implements CityDistrictService {
         if (request.getBranchIds() != null) {
             request.getBranchIds().values().forEach(branchId -> {
                 Branch branch = branchRepository.findById(branchId)
-                        .orElseThrow(() -> new NotFoundException("Branch not found"));
+                        .orElseThrow(() -> new NotFoundException(BRANCH_NOT_FOUND));
                 district.getBranches().add(branch);
                 branch.setDistrict(district);
                 branchRepository.save(branch);
@@ -84,7 +86,7 @@ public class CityDistrictServiceImpl implements CityDistrictService {
     @Override
     public void updateCity(UpdateCityRequest request) {
         City city = cityRepository.findById(request.getId())
-                .orElseThrow(() -> new NotFoundException("City not found"));
+                .orElseThrow(() -> new NotFoundException(CITY_NOT_FOUND));
 
         if (request.getName() != null) {
             city.setName(request.getName());
@@ -98,12 +100,12 @@ public class CityDistrictServiceImpl implements CityDistrictService {
     @Override
     public City getCityById(Long cityId) {
         return cityRepository.findById(cityId)
-                .orElseThrow(() -> new NotFoundException("City not found"));
+                .orElseThrow(() -> new NotFoundException(CITY_NOT_FOUND));
     }
 
     @Override
     public District getDistrictById(Long districtId) {
         return districtRepository.findById(districtId)
-                .orElseThrow(() -> new NotFoundException("District not found"));
+                .orElseThrow(() -> new NotFoundException(DISTRICT_NOT_FOUND));
     }
 }

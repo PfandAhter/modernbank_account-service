@@ -2,7 +2,6 @@ package com.modernbank.account_service.rest.service.impl;
 
 import com.modernbank.account_service.api.request.UpdateBranchRequest;
 import com.modernbank.account_service.entity.Branch;
-import com.modernbank.account_service.entity.City;
 import com.modernbank.account_service.entity.District;
 import com.modernbank.account_service.exception.NotFoundException;
 import com.modernbank.account_service.model.BranchModel;
@@ -12,8 +11,7 @@ import com.modernbank.account_service.model.enums.Status;
 import com.modernbank.account_service.repository.BranchRepository;
 import com.modernbank.account_service.api.request.CreateBranchRequest;
 import com.modernbank.account_service.rest.service.CityDistrictService;
-import com.modernbank.account_service.rest.service.MapperService;
-import com.modernbank.account_service.rest.service.IBranchService;
+import com.modernbank.account_service.rest.service.BranchService;
 import com.modernbank.account_service.rest.service.cache.branch.BranchCacheService;
 import com.modernbank.account_service.rest.service.cache.district.CityDistrictCacheService;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +21,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.modernbank.account_service.constants.ErrorCodeConstants.BRANCH_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BranchServiceImpl implements IBranchService {
+public class BranchServiceImpl implements BranchService {
 
     private final BranchRepository branchRepository;
 
@@ -52,7 +52,7 @@ public class BranchServiceImpl implements IBranchService {
     @Override
     public void updateBranch(UpdateBranchRequest request) {
         Branch branch = branchRepository.findBranchById(request.getId())
-                .orElseThrow(() -> new NotFoundException("Branch not found"));
+                .orElseThrow(() -> new NotFoundException(BRANCH_NOT_FOUND));
 
         if(request.getName() != null){
             branch.setName(request.getName());

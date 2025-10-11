@@ -1,6 +1,7 @@
 package com.modernbank.account_service.api;
 
 import com.modernbank.account_service.api.request.CreateUserRequest;
+import com.modernbank.account_service.api.request.UpdateUserInfoRequest;
 import com.modernbank.account_service.api.request.UpdateUserRequest;
 import com.modernbank.account_service.api.response.BaseResponse;
 import com.modernbank.account_service.api.response.GetUserInfoResponse;
@@ -20,4 +21,7 @@ public interface UserControllerApi {
 
     @GetMapping(path = "/get/info")
     GetUserInfoResponse getUserInfo(HttpServletRequest httpServletRequest);
+
+    @PostMapping(path = "/update/info")
+    BaseResponse updateUserInfo(@RequestBody UpdateUserInfoRequest updateUserInfoRequest, HttpServletRequest request);
 }

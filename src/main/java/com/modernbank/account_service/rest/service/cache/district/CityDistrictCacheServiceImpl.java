@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.modernbank.account_service.constants.ErrorCodeConstants.ACTIVE_CITIES_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -34,7 +36,7 @@ public class CityDistrictCacheServiceImpl implements CityDistrictCacheService {
     @Override
     public List<DistrictModel> getDistrictsByCityId(Long cityId) {
         List<District> districts = districtRepository.findDistrictByCityId(cityId)
-                .orElseThrow(() -> new NotFoundException("District not found with cityId: " + cityId));
+                .orElseThrow(() -> new NotFoundException("District not found with cityId: " + cityId)); // TODO: Burada ki gibi dynamic value olanlari baska bir sekilde handle edeyim.
 
         return mapperService.map(districts, DistrictModel.class);
     }
@@ -42,9 +44,9 @@ public class CityDistrictCacheServiceImpl implements CityDistrictCacheService {
     @Cacheable(value = "city")
     public List<CityModel> getCities() {
         List<City> cities = cityRepository.findAllActiveCities()
-                .orElseThrow(() -> new NotFoundException("Cities with active branches not found"));
+                .orElseThrow(() -> new NotFoundException(ACTIVE_CITIES_NOT_FOUND));
 
-        return mapperService.map(cities, CityModel.class); // Placeholder return statement
+        return mapperService.map(cities, CityModel.class);
     }
 
     @Override

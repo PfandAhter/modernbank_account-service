@@ -55,6 +55,9 @@ public class User implements UserDetails {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
+    @Column(name = "address")
+    private String address;
+
     private boolean isAccountNonExpired;
 
     private boolean isAccountNonLocked;

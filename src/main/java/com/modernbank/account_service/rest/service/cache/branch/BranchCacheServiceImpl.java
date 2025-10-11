@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.modernbank.account_service.constants.ErrorCodeConstants.BRANCH_NOT_FOUND_BY_DISTRICT_ID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class BranchCacheServiceImpl implements BranchCacheService {
     @Override
     public List<BranchModel> getBranchCacheValuesByDistrictId(Long districtId) {
         return mapperService.map(branchRepository.findBranchesByDistrictId(districtId)
-                .orElseThrow(() -> new NotFoundException("")), BranchModel.class); //TODO: Bunu duzelt...
+                .orElseThrow(() -> new NotFoundException(BRANCH_NOT_FOUND_BY_DISTRICT_ID)), BranchModel.class); // TODO: Burada ki gibi dynamic value olanlari baska bir sekilde handle edeyim.
     }
 
     @CacheEvict(value = "branch", allEntries = true)

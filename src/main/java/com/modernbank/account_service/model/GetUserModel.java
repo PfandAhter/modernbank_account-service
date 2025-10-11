@@ -11,6 +11,10 @@ import lombok.*;
 public class GetUserModel {
     private String id;
     private String email;
+    private String tckn;
+    private String phoneNumber;
+    private String address;
+    private String birthDate;
     private String firstName;
     private String secondName;
     private String lastName;

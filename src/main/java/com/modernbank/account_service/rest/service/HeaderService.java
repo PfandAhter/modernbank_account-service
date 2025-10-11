@@ -1,7 +1,9 @@
 package com.modernbank.account_service.rest.service;
 
-public interface IHeaderService {
+public interface HeaderService {
     String extractToken();
+
+    String extractUserEmail();
 
     String extractUserId();
 

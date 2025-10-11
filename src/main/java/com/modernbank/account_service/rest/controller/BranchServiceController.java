@@ -11,7 +11,7 @@ import com.modernbank.account_service.api.request.CreateBranchRequest;
 import com.modernbank.account_service.api.response.BaseResponse;
 import com.modernbank.account_service.api.response.GetActiveBranchesResponse;
 import com.modernbank.account_service.rest.service.MapperService;
-import com.modernbank.account_service.rest.service.IBranchService;
+import com.modernbank.account_service.rest.service.BranchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class BranchServiceController implements BranchControllerApi {
 
-    private final IBranchService branchService;
+    private final BranchService branchService;
 
     private final MapperService mapperService;
 

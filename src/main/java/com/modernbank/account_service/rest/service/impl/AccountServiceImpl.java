@@ -3,7 +3,6 @@ package com.modernbank.account_service.rest.service.impl;
 import com.modernbank.account_service.exception.NotFoundException;
 import com.modernbank.account_service.model.AccountListModel;
 import com.modernbank.account_service.repository.UserRepository;
-import com.modernbank.account_service.api.request.BaseRequest;
 import com.modernbank.account_service.api.request.CreateAccountRequest;
 import com.modernbank.account_service.api.response.BaseResponse;
 import com.modernbank.account_service.entity.Account;
@@ -14,8 +13,7 @@ import com.modernbank.account_service.repository.AccountRepository;
 import com.modernbank.account_service.repository.BranchRepository;
 import com.modernbank.account_service.api.response.GetAccountByIBAN;
 import com.modernbank.account_service.api.response.GetAccountOwnerNameResponse;
-import com.modernbank.account_service.api.response.GetAccountsResponse;
-import com.modernbank.account_service.rest.service.IAccountService;
+import com.modernbank.account_service.rest.service.AccountService;
 import com.modernbank.account_service.rest.service.cache.account.IAccountCacheService;
 import com.modernbank.account_service.util.IbanGenerationService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AccountServiceImpl implements IAccountService {
+public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
 

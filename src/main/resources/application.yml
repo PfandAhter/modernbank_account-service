@@ -25,4 +25,4 @@ spring:
   main:
     banner-mode: off
 server:
-  port: 8081
+  port: 8084
