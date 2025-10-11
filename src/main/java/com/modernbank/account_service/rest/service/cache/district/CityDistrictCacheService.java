@@ -9,4 +9,8 @@ public interface CityDistrictCacheService {
     List<DistrictModel> getDistrictsByCityId(Long cityId);
 
     List<CityModel> getCities();
+
+    void evictCityCacheValues();
+
+    void evictDistrictCacheValues();
 }

@@ -1,7 +1,7 @@
 package com.modernbank.account_service.rest.service.impl;
 
 import com.modernbank.account_service.constants.HeaderKey;
-import com.modernbank.account_service.rest.service.IHeaderService;
+import com.modernbank.account_service.rest.service.HeaderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,13 +10,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class HeaderServiceImpl implements IHeaderService {
+public class HeaderServiceImpl implements HeaderService {
 
     private final HttpServletRequest request;
-
-    //private final SecurityServiceClient securityServiceClient;
-
-    //TODO: Token Client cagirimi ve tokenden userid extraction islemi
 
     @Override
     public String extractToken(){
@@ -30,12 +26,21 @@ public class HeaderServiceImpl implements IHeaderService {
     }
 
     @Override
+    public String extractUserEmail(){
+        String userEmail = null;
+        try{
+            userEmail = request.getHeader(HeaderKey.USER_EMAIL);
+        }catch(Exception e){
+            log.error("Error while extracting userEmail from token: {}", e.getMessage());
+        }
+        return userEmail;
+    }
+
+    @Override
     public String extractUserId(){
         String userId = null;
         try{
-            String token = extractToken();
-            //userId = securityServiceClient.extractUserIdFromToken();
-            userId = token.split(" ")[1]; //TODO: BURADA TOKEN SERVICE CAGIRIMI YAPILICAKTIR...
+            userId = request.getHeader(HeaderKey.USER_ID);
         }catch (Exception E){
             log.error("Error while extracting userId from token: {}", E.getMessage());
         }
@@ -48,9 +53,8 @@ public class HeaderServiceImpl implements IHeaderService {
         try{
             userRole = request.getHeader(HeaderKey.USER_ROLE);
         }catch (Exception e){
-            log.error("");
+            log.error("Error while extracting userRole from token: {}", e.getMessage());
         }
-
         return userRole;
     }
 }

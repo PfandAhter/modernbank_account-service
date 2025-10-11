@@ -15,11 +15,13 @@ import com.modernbank.account_service.repository.BranchRepository;
 import com.modernbank.account_service.repository.CityRepository;
 import com.modernbank.account_service.repository.DistrictRepository;
 import com.modernbank.account_service.rest.service.CityDistrictService;
-import com.modernbank.account_service.rest.service.IMapperService;
+import com.modernbank.account_service.rest.service.MapperService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+
+import static com.modernbank.account_service.constants.ErrorCodeConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class CityDistrictServiceImpl implements CityDistrictService {
 
     private final BranchRepository branchRepository;
 
-    private final IMapperService mapperService;
+    private final MapperService mapperService;
 
     @Override
     public void createCity(CreateCityRequest request) {
@@ -46,7 +48,7 @@ public class CityDistrictServiceImpl implements CityDistrictService {
     @Override
     public void createDistrict(CreateDistrictRequest request) {
         City city = cityRepository.findById(request.getCityId())
-                .orElseThrow(() -> new NotFoundException("City not found"));
+                .orElseThrow(() -> new NotFoundException(CITY_NOT_FOUND));
 
         districtRepository.save(District.builder()
                 .city(city)
@@ -59,20 +61,20 @@ public class CityDistrictServiceImpl implements CityDistrictService {
     @Override
     public void updateDistrict(UpdateDistrictRequest request) {
         District district = districtRepository.findById(request.getId())
-                .orElseThrow(() -> new NotFoundException("District not found"));
+                .orElseThrow(() -> new NotFoundException(DISTRICT_NOT_FOUND));
 
         if (request.getName() != null) {
             district.setName(request.getName());
         }
 
-        if(request.getStatus() != null){
+        if (request.getStatus() != null) {
             district.setStatus(Status.valueOf(request.getStatus().toUpperCase()));
         }
 
-        if(request.getBranchIds() != null){
-            request.getBranchIds().values().forEach(branchId ->{
+        if (request.getBranchIds() != null) {
+            request.getBranchIds().values().forEach(branchId -> {
                 Branch branch = branchRepository.findById(branchId)
-                        .orElseThrow(() -> new NotFoundException("Branch not found"));
+                        .orElseThrow(() -> new NotFoundException(BRANCH_NOT_FOUND));
                 district.getBranches().add(branch);
                 branch.setDistrict(district);
                 branchRepository.save(branch);
@@ -82,32 +84,28 @@ public class CityDistrictServiceImpl implements CityDistrictService {
     }
 
     @Override
-    public void updateCity(UpdateCityRequest request){
+    public void updateCity(UpdateCityRequest request) {
         City city = cityRepository.findById(request.getId())
-                .orElseThrow(() -> new NotFoundException("City not found"));
+                .orElseThrow(() -> new NotFoundException(CITY_NOT_FOUND));
 
-        if(request.getName() != null){
+        if (request.getName() != null) {
             city.setName(request.getName());
         }
-        if(request.getStatus() != null){
+        if (request.getStatus() != null) {
             city.setStatus(Status.valueOf(request.getStatus().toUpperCase()));
         }
         cityRepository.save(city);
     }
 
     @Override
-    public CityModel getCityById(Long cityId) {
-        City city = cityRepository.findById(cityId)
-                .orElseThrow(() -> new NotFoundException("City not found"));
-
-        return mapperService.map(city, CityModel.class);
+    public City getCityById(Long cityId) {
+        return cityRepository.findById(cityId)
+                .orElseThrow(() -> new NotFoundException(CITY_NOT_FOUND));
     }
 
     @Override
-    public DistrictModel getDistrictById(Long districtId) {
-        District district = districtRepository.findById(districtId)
-                .orElseThrow(() -> new NotFoundException("District not found"));
-
-        return mapperService.map(district, DistrictModel.class);
+    public District getDistrictById(Long districtId) {
+        return districtRepository.findById(districtId)
+                .orElseThrow(() -> new NotFoundException(DISTRICT_NOT_FOUND));
     }
 }

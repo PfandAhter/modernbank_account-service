@@ -1,6 +1,6 @@
 package com.modernbank.account_service.rest.service.impl;
 
-import com.modernbank.account_service.rest.service.IMapperService;
+import com.modernbank.account_service.rest.service.MapperService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 
-public class MapperServiceImpl implements IMapperService {
+public class MapperServiceImpl implements MapperService {
 
     private final ModelMapper modelMapper;
 

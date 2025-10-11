@@ -4,8 +4,8 @@ import com.modernbank.account_service.api.request.citydistrict.CreateCityRequest
 import com.modernbank.account_service.api.request.citydistrict.CreateDistrictRequest;
 import com.modernbank.account_service.api.request.citydistrict.UpdateCityRequest;
 import com.modernbank.account_service.api.request.citydistrict.UpdateDistrictRequest;
-import com.modernbank.account_service.model.CityModel;
-import com.modernbank.account_service.model.DistrictModel;
+import com.modernbank.account_service.entity.City;
+import com.modernbank.account_service.entity.District;
 
 public interface CityDistrictService {
 
@@ -17,7 +17,7 @@ public interface CityDistrictService {
 
     void updateCity(UpdateCityRequest request);
 
-    CityModel getCityById(Long cityId);
+    City getCityById(Long cityId);
 
-    DistrictModel getDistrictById(Long districtId);
+    District getDistrictById(Long districtId);
 }

@@ -1,8 +1,8 @@
 package com.modernbank.account_service.rest.service.cache.account;
 
-import com.modernbank.account_service.model.dto.AccountDTO;
+import com.modernbank.account_service.api.dto.AccountDTO;
 import com.modernbank.account_service.repository.AccountRepository;
-import com.modernbank.account_service.rest.service.IMapperService;
+import com.modernbank.account_service.rest.service.MapperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -18,7 +18,7 @@ public class AccountCacheServiceImpl implements IAccountCacheService {
 
     private final AccountRepository accountRepository;
 
-    private final IMapperService mapperService;
+    private final MapperService mapperService;
 
     @Cacheable(value = "account", key = "#userId")
     @Override

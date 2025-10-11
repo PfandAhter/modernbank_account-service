@@ -1,26 +1,28 @@
 package com.modernbank.account_service.rest.controller;
 
-import com.modernbank.account_service.rest.controller.api.AccountControllerApi;
-import com.modernbank.account_service.rest.controller.api.request.BaseRequest;
-import com.modernbank.account_service.rest.controller.api.request.CreateAccountRequest;
-import com.modernbank.account_service.rest.controller.api.response.BaseResponse;
-import com.modernbank.account_service.rest.controller.api.response.GetAccountByIBAN;
-import com.modernbank.account_service.rest.controller.api.response.GetAccountOwnerNameResponse;
-import com.modernbank.account_service.rest.controller.api.response.GetAccountsResponse;
-import com.modernbank.account_service.rest.service.account.IAccountService;
+import com.modernbank.account_service.api.AccountControllerApi;
+import com.modernbank.account_service.api.request.BaseRequest;
+import com.modernbank.account_service.api.request.CreateAccountRequest;
+import com.modernbank.account_service.api.response.BaseResponse;
+import com.modernbank.account_service.api.response.GetAccountByIBAN;
+import com.modernbank.account_service.api.response.GetAccountOwnerNameResponse;
+import com.modernbank.account_service.api.response.GetAccountsResponse;
+import com.modernbank.account_service.rest.service.AccountService;
+import com.modernbank.account_service.rest.service.MapperService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/account")
 @RequiredArgsConstructor
-@CrossOrigin
 public class AccountServiceController implements AccountControllerApi {
 
-    private final IAccountService accountService;
+    private final AccountService accountService;
+
+    private final MapperService mapperService;
 
     @Override
     public ResponseEntity<BaseResponse> createAccount(CreateAccountRequest createAccountRequest) {
@@ -28,8 +30,16 @@ public class AccountServiceController implements AccountControllerApi {
     }
 
     @Override
-    public ResponseEntity<GetAccountsResponse> getAccounts(BaseRequest baseRequest) {
-        return ResponseEntity.ok(accountService.getAccountsByUser(baseRequest));
+    public GetAccountsResponse getAccounts(String userId, HttpServletRequest request) {
+        if (userId == null) {
+            return mapperService.map(accountService.getAccountsByUser(request.getHeader("X-User-Id")), GetAccountsResponse.class);
+        }
+        return mapperService.map(accountService.getAccountsByUser(userId), GetAccountsResponse.class);
+    }
+
+    @Override
+    public GetAccountsResponse getAccountsV2(BaseRequest baseRequest) {
+        return mapperService.map(accountService.getAccountsByUser(baseRequest.getUserId()), GetAccountsResponse.class);
     }
 
     @Override

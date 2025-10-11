@@ -59,4 +59,16 @@ public class ErrorCodeConstants {
     public static final String BANK_NOT_FOUND = "H0028";
 
     public static final String PDF_GENERATION_FAILED = "H0029";
+
+    public static final String BRANCH_NOT_FOUND_BY_DISTRICT_ID = "H0035";
+
+    public static final String ACTIVE_CITIES_NOT_FOUND = "H0036";
+
+    public static final String CITY_NOT_FOUND = "H0037";
+
+    public static final String DISTRICT_NOT_FOUND = "H0038";
+
+    public static final String TCKN_CANNOT_BE_CHANGED = "H0039";
+
+    public static final String EMAIL_CANNOT_BE_CHANGED = "H0040";
 }
