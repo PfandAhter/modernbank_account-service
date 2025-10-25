@@ -1,7 +1,9 @@
 package com.modernbank.account_service.rest.service.impl;
 
+import com.modernbank.account_service.api.request.GetAccountDetailsRequest;
 import com.modernbank.account_service.exception.NotFoundException;
 import com.modernbank.account_service.model.AccountListModel;
+import com.modernbank.account_service.model.AccountModel;
 import com.modernbank.account_service.repository.UserRepository;
 import com.modernbank.account_service.api.request.CreateAccountRequest;
 import com.modernbank.account_service.api.response.BaseResponse;
@@ -14,6 +16,7 @@ import com.modernbank.account_service.repository.BranchRepository;
 import com.modernbank.account_service.api.response.GetAccountByIBAN;
 import com.modernbank.account_service.api.response.GetAccountOwnerNameResponse;
 import com.modernbank.account_service.rest.service.AccountService;
+import com.modernbank.account_service.rest.service.MapperService;
 import com.modernbank.account_service.rest.service.cache.account.IAccountCacheService;
 import com.modernbank.account_service.util.IbanGenerationService;
 import lombok.RequiredArgsConstructor;
@@ -43,15 +46,16 @@ public class AccountServiceImpl implements AccountService {
 
     private final IbanGenerationService ibanGenerationService;
 
+    private final MapperService mapperService;
+
     @Override
-    public BaseResponse createAccount(CreateAccountRequest request){
+    public BaseResponse createAccount(CreateAccountRequest request) {
 
         Branch branch = branchRepository.findBranchById(request.getBranchId())
                 .orElseThrow(() -> new NotFoundException(BRANCH_NOT_FOUND));
 
-        //TODO: BURADA TOKENDEN USER EXTRACT EDILICEK...
-        User user = userRepository.findByTCKN("14219585746")
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        User user = userRepository.findByUserId(request.getUserId())
+                        .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
 
         accountRepository.save(Account.builder()
                 .iban(ibanGenerationService.generateUniqueIban())
@@ -83,10 +87,10 @@ public class AccountServiceImpl implements AccountService {
     }*/
 
     @Override
-    public AccountListModel getAccountsByUser(String userId){
-        User user = userRepository.findByUserId("6bb91e57-032c-40db-b6ce-4e3ef459c3a0") //TODO: Burasi tokenden extract edilicek...
+    public AccountListModel getAccountsByUser(String userId) {
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-//        accountCacheService.refreshAccountsByUserId();
+//        accountCacheService.refreshAccountsByUserId(); //TODO: BUNLARI BIR UCA BAGLA DA DISARIDAN MUDAHELE EDILEBILIR SEKILDE OLSUN.
 
         return AccountListModel.builder()
                 .firstName(user.getFirstName())
@@ -94,15 +98,25 @@ public class AccountServiceImpl implements AccountService {
                 .lastName(user.getLastName())
                 .accounts(accountCacheService.getAccountsByUserId(user.getId()))
                 .build();
-    }//TODO: Buraya simdilik kendi useridmi yazdim bunu dinamiklestirirsin. Birde calisiyor mu test et...
+    }
 
     @Override
-    public GetAccountByIBAN getAccountByIBAN (String iban) {
+    public AccountModel getAccountDetails(GetAccountDetailsRequest request) {
+        Account account = accountRepository.findAccountById(request.getAccountId())
+                .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND));
+
+        return mapperService.map(account, AccountModel.class);
+    }
+
+    @Override
+    public GetAccountByIBAN getAccountByIBAN(String iban) {
         Account account = accountRepository.findAccountByIban(iban)
                 .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND_BY_IBAN));
 
-        User user = userRepository.findByTCKN(account.getUser().getTckn())
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        User user = account.getUser();
+        /*
+        * 
+        * */
 
         return GetAccountByIBAN.builder()
                 .accountId(account.getId())
@@ -118,7 +132,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public GetAccountOwnerNameResponse getAccountOwnerName (String iban) {
+    public GetAccountOwnerNameResponse getAccountOwnerName(String iban) {
         Account account = accountRepository.findAccountByIban(iban)
                 .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND));
 

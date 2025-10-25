@@ -2,15 +2,19 @@ package com.modernbank.account_service.rest.service;
 
 
 import com.modernbank.account_service.api.request.CreateAccountRequest;
+import com.modernbank.account_service.api.request.GetAccountDetailsRequest;
 import com.modernbank.account_service.api.response.BaseResponse;
 import com.modernbank.account_service.api.response.GetAccountByIBAN;
 import com.modernbank.account_service.api.response.GetAccountOwnerNameResponse;
 import com.modernbank.account_service.model.AccountListModel;
+import com.modernbank.account_service.model.AccountModel;
 
 public interface AccountService {
     BaseResponse createAccount(CreateAccountRequest request);
 
     AccountListModel getAccountsByUser(String userId);
+
+    AccountModel getAccountDetails(GetAccountDetailsRequest request);
 
     GetAccountByIBAN getAccountByIBAN (String iban);
 

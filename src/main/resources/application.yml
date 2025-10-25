@@ -26,3 +26,16 @@ spring:
     banner-mode: off
 server:
   port: 8084
+
+
+feign:
+  client:
+    email-service:
+      url: http://localhost:8087/api/v1/email
+      verifyUser: /user/verify
+      passwordReset: /user/password-reset
+    parameter-service:
+      url: http://localhost:8086/api/v1
+      getByCode: /error-codes/error-code
+      logError: /log/error
+      getAllErrorCodes: /error-codes/error-code/all

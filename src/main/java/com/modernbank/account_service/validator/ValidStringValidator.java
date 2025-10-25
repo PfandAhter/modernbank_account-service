@@ -8,7 +8,12 @@ import java.util.regex.Pattern;
 
 public class ValidStringValidator implements ConstraintValidator<ValidString,String> {
 
-    private final Pattern STRING_REGEX = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z]).{0,255}$");
+    // NOTE: The regex pattern below was changed from requiring both uppercase and lowercase letters
+    // to allowing any combination of letters and spaces (including Turkish characters).
+    // This is a breaking change in validation behavior. The new pattern allows strings containing
+    // only letters (a-z, A-Z, Turkish characters) and spaces, with a length between 1 and 255.
+    // Previous pattern required both uppercase and lowercase letters; now, any mix is accepted.
+    private final Pattern STRING_REGEX = Pattern.compile("^[a-zA-ZçÇğĞıİöÖşŞüÜ\\s]{1,255}$");
 
     @Override
     public boolean isValid(String string, ConstraintValidatorContext context) {

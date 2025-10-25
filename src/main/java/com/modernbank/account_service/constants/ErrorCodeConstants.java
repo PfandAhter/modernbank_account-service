@@ -71,4 +71,12 @@ public class ErrorCodeConstants {
     public static final String TCKN_CANNOT_BE_CHANGED = "H0039";
 
     public static final String EMAIL_CANNOT_BE_CHANGED = "H0040";
+
+    public static final String OTP_EXPIRED = "H0041";
+
+    public static final String OTP_ALREADY_USED = "H0042";
+
+    public static final String OTP_NOT_FOUND_OR_INVALID = "H0043";
+
+    public static final String USER_ALREADY_EXISTS = "H0044";
 }

@@ -1,7 +1,5 @@
 package com.modernbank.account_service.api.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.modernbank.account_service.constants.ErrorCodeConstants;
 import com.modernbank.account_service.constants.ResponseStatus;
 import lombok.AllArgsConstructor;
