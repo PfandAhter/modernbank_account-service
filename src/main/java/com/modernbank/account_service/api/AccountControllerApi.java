@@ -2,10 +2,8 @@ package com.modernbank.account_service.api;
 
 import com.modernbank.account_service.api.request.BaseRequest;
 import com.modernbank.account_service.api.request.CreateAccountRequest;
-import com.modernbank.account_service.api.response.BaseResponse;
-import com.modernbank.account_service.api.response.GetAccountByIBAN;
-import com.modernbank.account_service.api.response.GetAccountOwnerNameResponse;
-import com.modernbank.account_service.api.response.GetAccountsResponse;
+import com.modernbank.account_service.api.request.GetAccountDetailsRequest;
+import com.modernbank.account_service.api.response.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +15,9 @@ public interface AccountControllerApi {
 
     @GetMapping(path = "/get")
     GetAccountsResponse getAccounts(@RequestHeader("X-User-Id") String userId, HttpServletRequest request);
+
+    @PostMapping(path = "/get-details")
+    GetAccountDetailsResponse getAccountDetails(@RequestBody GetAccountDetailsRequest request);
 
     @PostMapping(path = "/getv2")
     GetAccountsResponse getAccountsV2(@RequestBody BaseRequest baseRequest);

@@ -1,5 +1,6 @@
 package com.modernbank.account_service.configuration;
 
+import com.modernbank.account_service.entity.ErrorCodes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -11,7 +12,9 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -30,7 +33,7 @@ public class RedisConfiguration {
     private String redisPort;
 
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
+    public LettuceConnectionFactory lettuceConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, Integer.parseInt(redisPort));
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
@@ -44,6 +47,16 @@ public class RedisConfiguration {
                 .cacheDefaults(createCacheConfiguration(Duration.ofMinutes(15)))
                 .withInitialCacheConfigurations(cacheConfigurations)
                 .build();
+    }
+
+    @Bean
+    public RedisTemplate<String, ErrorCodes> redisTemplate(LettuceConnectionFactory connectionFactory) {
+        RedisTemplate<String, ErrorCodes> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        Jackson2JsonRedisSerializer<ErrorCodes> jsonSerializer = new Jackson2JsonRedisSerializer<>(ErrorCodes.class);
+        template.setValueSerializer(jsonSerializer);
+        return template;
     }
 
     private RedisCacheConfiguration createCacheConfiguration(Duration ttl) {

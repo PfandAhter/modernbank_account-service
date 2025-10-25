@@ -25,7 +25,7 @@ public class User implements UserDetails {
     @Column
     private String id;
 
-    @Column(name = "tckn", nullable = false)
+    @Column(name = "tckn")
     private String tckn;
 
     @Column(name = "firstName", nullable = false)
@@ -37,7 +37,7 @@ public class User implements UserDetails {
     @Column(name = "lastName", nullable = false)
     private String lastName;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)
@@ -46,7 +46,7 @@ public class User implements UserDetails {
     @Column(name = "gsm", nullable = false)
     private String gsm;
 
-    @Column(name = "datofbirth", nullable = false)
+    @Column(name = "datofbirth")
     private String dateOfBirth;
 
     @Column(name = "created_date")
@@ -74,6 +74,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Account> accounts;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<SavedAccount> savedAccounts;
 
     @Override
     public String getUsername() {

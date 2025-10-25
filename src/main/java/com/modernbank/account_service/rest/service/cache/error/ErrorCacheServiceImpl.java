@@ -1,40 +1,73 @@
 package com.modernbank.account_service.rest.service.cache.error;
 
-import com.modernbank.account_service.exception.ErrorCodesNotFoundException;
+import com.modernbank.account_service.api.client.ParameterServiceClient;
+import com.modernbank.account_service.api.response.GetAllErrorCodesResponse;
+import com.modernbank.account_service.api.response.GetErrorCodeResponse;
 import com.modernbank.account_service.entity.ErrorCodes;
-import com.modernbank.account_service.repository.ErrorCodesRepository;
+import com.modernbank.account_service.rest.service.MapperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 
-public class ErrorCacheServiceImpl implements IErrorCacheService{
+public class ErrorCacheServiceImpl implements ErrorCacheService {
 
-    private final ErrorCodesRepository errorCodesRepository;
 
-    @Cacheable(value = "errorCodes", key = "'all'")
+    private final MapperService mapperService;
+
+    private final RedisTemplate<String, ErrorCodes> redisTemplate;
+
+    private static final String ERROR_CODES_CACHE_KEY = "ERROR_CODE_CACHE";
+
+    private final ParameterServiceClient parameterServiceClient;
+
     @Override
-    public List<ErrorCodes> getAllErrorCodes(){
-        return errorCodesRepository.findAll();
+    public ErrorCodes getErrorCodeByErrorId(String code){
+        String cacheKey = ERROR_CODES_CACHE_KEY + code;
+        ErrorCodes errorCode = redisTemplate.opsForValue().get(cacheKey);
+
+        if(errorCode != null){
+            return errorCode;
+        }
+        GetErrorCodeResponse response;
+        try{
+            response = parameterServiceClient.getErrorCode(code);
+        }catch (Exception e){
+            return handleErrorGetFailed(code);
+        }
+        redisTemplate.opsForValue().set(cacheKey, mapperService.map(response.getErrorCode(), ErrorCodes.class));
+
+        return mapperService.map(response.getErrorCode(), ErrorCodes.class);
     }
 
-    @Cacheable(value = "errorCode", key = "#errorCodeId")
+    @Scheduled(fixedRate = 3600000) // every hour
     @Override
-    public ErrorCodes getErrorCode(String errorCodeId){
-        return errorCodesRepository.findErrorCodesById(errorCodeId)
-                .orElseThrow(() -> new ErrorCodesNotFoundException(errorCodeId, LocalDateTime.now()));
+    public void refreshAllErrorCodesCache() {
+        try {
+                        GetAllErrorCodesResponse allErrorCodes = parameterServiceClient.getAllErrorCodes("account-service");
+            log.info("Refreshing error codes cache");
+
+            allErrorCodes.getErrorCodes().forEach(errorCodeDTO-> {
+                String code = errorCodeDTO.getError();
+                String cacheKey = ERROR_CODES_CACHE_KEY + code;
+                ErrorCodes errorCode = mapperService.map(errorCodeDTO, ErrorCodes.class);
+                redisTemplate.opsForValue().set(cacheKey, errorCode);
+            });
+        } catch (Exception e) {
+            log.error("Error refreshing error codes cache, keeping existing cache.", e);
+        }
     }
 
-    @CacheEvict(value = {"errorCodes","errorCode"}, allEntries = true)
-    public void refreshErrorCodesCache(){
-        log.info("Error Codes Cache has been refreshed");
+    private ErrorCodes handleErrorGetFailed(String code){
+        return ErrorCodes.builder()
+                .id(code)
+                .error("Not Found")
+                .description("The requested resource was not found")
+                .build();
     }
 }

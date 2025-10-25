@@ -1,12 +1,11 @@
 package com.modernbank.account_service.rest.controller;
 
 import com.modernbank.account_service.api.AccountControllerApi;
+import com.modernbank.account_service.api.dto.AccountDTO;
 import com.modernbank.account_service.api.request.BaseRequest;
 import com.modernbank.account_service.api.request.CreateAccountRequest;
-import com.modernbank.account_service.api.response.BaseResponse;
-import com.modernbank.account_service.api.response.GetAccountByIBAN;
-import com.modernbank.account_service.api.response.GetAccountOwnerNameResponse;
-import com.modernbank.account_service.api.response.GetAccountsResponse;
+import com.modernbank.account_service.api.request.GetAccountDetailsRequest;
+import com.modernbank.account_service.api.response.*;
 import com.modernbank.account_service.rest.service.AccountService;
 import com.modernbank.account_service.rest.service.MapperService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +34,11 @@ public class AccountServiceController implements AccountControllerApi {
             return mapperService.map(accountService.getAccountsByUser(request.getHeader("X-User-Id")), GetAccountsResponse.class);
         }
         return mapperService.map(accountService.getAccountsByUser(userId), GetAccountsResponse.class);
+    }
+
+    @Override
+    public GetAccountDetailsResponse getAccountDetails(GetAccountDetailsRequest request) {
+        return new GetAccountDetailsResponse(mapperService.map(accountService.getAccountDetails(request), AccountDTO.class));
     }
 
     @Override

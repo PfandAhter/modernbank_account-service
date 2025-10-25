@@ -1,9 +1,11 @@
 package com.modernbank.account_service.exception;
 
-import com.modernbank.account_service.api.response.ErrorResponse;
-import com.modernbank.account_service.api.dto.ErrorCodesDTO;
-import com.modernbank.account_service.rest.service.MapperService;
-import com.modernbank.account_service.rest.service.cache.error.IErrorCacheService;
+import com.modernbank.account_service.api.client.ParameterServiceClient;
+import com.modernbank.account_service.api.request.LogErrorRequest;
+import com.modernbank.account_service.api.response.BaseResponse;
+import com.modernbank.account_service.entity.ErrorCodes;
+import com.modernbank.account_service.rest.service.cache.error.ErrorCacheService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,40 +22,61 @@ import java.time.LocalDateTime;
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private final IErrorCacheService errorCacheService;
+    private final ErrorCacheService errorCacheService;
 
-    private final MapperService mapperService;
+    private final ParameterServiceClient parameterServiceClient;
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<ErrorResponse> handleException(NotFoundException e){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createFailResponseBody(e.getMessage(),HttpStatus.NOT_FOUND));
+    public ResponseEntity<BaseResponse> handleException(NotFoundException e,HttpServletRequest request){
+        logError(e);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createErrorResponseBody(e,request));
     }
 
     @ExceptionHandler(ErrorCodesNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    public ResponseEntity<ErrorResponse> handleException(ErrorCodesNotFoundException e){
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(createErrorNotFoundResponseBody(e.getMessage(),HttpStatus.NOT_ACCEPTABLE));
+    public ResponseEntity<BaseResponse> handleException(ErrorCodesNotFoundException e,HttpServletRequest request){
+        logError(e);
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(createErrorResponseBody(e,request));
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    public ResponseEntity<ErrorResponse> handleException(Exception e){
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(createFailResponseBody(e.getMessage(),HttpStatus.NOT_ACCEPTABLE));
+    public ResponseEntity<BaseResponse> handleException(Exception e,HttpServletRequest request){
+        logError(e);
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(createErrorResponseBody(e,request));
     }
 
-    private ErrorResponse createErrorNotFoundResponseBody(String exceptionMessage, HttpStatus status){
-        log.error("Error message: {}", exceptionMessage);
-        return new ErrorResponse(status, "FAILED", exceptionMessage, LocalDateTime.now());
+    //TODO: Buraya HTTPSTATUS kodlarini da parametre servisine loglama icin gondermesini sagliyalim...
+    private BaseResponse createErrorResponseBody(Exception exception, HttpServletRequest request){
+        ErrorCodes errorCodes = getErrorCodeByErrorId(exception.getMessage());
+        logError(exception,request.getHeader("X-User-Id"));
+
+        return new BaseResponse("FAILED", errorCodes.getError(), errorCodes.getDescription());
     }
 
-    private ErrorResponse createFailResponseBody(String exceptionMessage,HttpStatus status){
-        log.error("Error message: {}", exceptionMessage);
-        ErrorCodesDTO errorCodesDTO = findByErrorCode(exceptionMessage);
-        return new ErrorResponse(status, errorCodesDTO.getError(), errorCodesDTO.getDescription(), LocalDateTime.now());
+    private ErrorCodes getErrorCodeByErrorId(String code){
+        return errorCacheService.getErrorCodeByErrorId(code);
     }
 
-    private ErrorCodesDTO findByErrorCode(String errorId) {
-        return mapperService.map(errorCacheService.getErrorCode(errorId), ErrorCodesDTO.class);
+    private void logError(Exception exception, String userId){
+        try{
+            LogErrorRequest request = LogErrorRequest.builder()
+                    .errorCode(exception.getMessage())
+                                        .serviceName("account-service")
+                    .timestamp(LocalDateTime.now().toString())
+                    .stackTrace(exception.getStackTrace().toString())
+                    .exceptionName(exception.getClass().getName())
+                    .build();
+
+            request.setUserId(userId);
+            parameterServiceClient.logError(request);
+        }catch (Exception e){
+            log.error("Error log process failed " + e.getMessage());
+        }
+    }
+
+    private void logError(Exception exception){
+        log.error("Error: " + exception.getMessage());
     }
 }

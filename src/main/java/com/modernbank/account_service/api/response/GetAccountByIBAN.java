@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @Builder
 
-public class    GetAccountByIBAN extends BaseResponse{
+public class GetAccountByIBAN extends BaseResponse{
 
     private String accountId;
 
