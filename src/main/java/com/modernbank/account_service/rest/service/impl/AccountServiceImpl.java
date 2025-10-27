@@ -136,8 +136,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findAccountByIban(iban)
                 .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND));
 
-        User user = userRepository.findByTCKN(account.getUser().getTckn())
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        User user = account.getUser();
 
         return GetAccountOwnerNameResponse.builder()
                 .firstName(user.getFirstName())
