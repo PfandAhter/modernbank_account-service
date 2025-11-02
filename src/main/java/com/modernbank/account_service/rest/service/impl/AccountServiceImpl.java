@@ -117,13 +117,22 @@ public class AccountServiceImpl implements AccountService {
         /*
         * 
         * */
+        String tckn = user.getTckn();
+        if (tckn != null) {
+            int visible = Math.min(4, tckn.length());
+            String visiblePart = tckn.substring(0, visible);
+            String maskedRest = "*".repeat(Math.max(0, tckn.length() - visible));
+            tckn = visiblePart + maskedRest;
+        }
 
         return GetAccountByIBAN.builder()
                 .accountId(account.getId())
+                .accountName(account.getName())
                 .userId(user.getId())
                 .firstName(user.getFirstName())
                 .secondName(user.getSecondName())
                 .lastName(user.getLastName())
+                .tckn(tckn)
                 .email(user.getEmail())
                 .balance(account.getBalance())
                 .currency(account.getCurrency())

@@ -14,6 +14,8 @@ public class GetAccountByIBAN extends BaseResponse{
 
     private String accountId;
 
+    private String accountName;
+
     private String userId;
 
     private String firstName;
@@ -21,6 +23,8 @@ public class GetAccountByIBAN extends BaseResponse{
     private String secondName;
 
     private String email;
+
+    private String tckn;
 
     private double balance;
 
