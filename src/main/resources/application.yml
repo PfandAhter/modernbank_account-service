@@ -42,6 +42,9 @@ feign:
       url: ${EMAIL_SERVICE_URL:http://localhost:8087}/api/v1
       verifyUser: /user/verify
       passwordReset: /user/password-reset
+      cardApprove: /card/approval
+      cardPending: /card/pending
+      cardReject: /card/rejection
     parameter-service:
       url: ${PARAMETER_SERVICE_URL:http://localhost:8086}/api/v1
       getByCode: /error-codes/error-code
