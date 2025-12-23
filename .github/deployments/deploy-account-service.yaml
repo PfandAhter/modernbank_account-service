@@ -1,0 +1,71 @@
+name: Authentication Service CI/CD
+
+on:
+  push:
+    branches: [ "main" ] 
+    paths:
+      - 'account-service/**' # Sadece bu klasör değiştiyse tetikle
+
+env:
+  # Kendi Azure kaynakların
+  ACR_NAME: ataberkbulutacr
+  IMAGE_NAME: account-service
+  CLUSTER_NAME: ataberk-aks-app-cluster
+  RESOURCE_GROUP: ataberk-aks-app-cluster_group
+  SERVICE_PATH: account-service # Account servisinin klasör adı
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    
+    # 1. Kodları Çek
+    - uses: actions/checkout@v3
+
+    # 2. Java'yı Kur ve Maven Cache Kullan
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    # 3. Maven ile Build Al (Jar oluştur)
+    - name: Build JAR with Maven
+      run: mvn clean package -DskipTests
+      working-directory: ${{ env.SERVICE_PATH }}
+
+    # 4. Azure'a Giriş Yap (Service Principal ile)
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        # Tenant ID'ni buraya ekleyebilirsin, ancak genellikle otomatik bulur.
+        tenant-id: 6bf2c465-3f48-4847-9f0f-f84b83764bd9
+
+    # 5. ACR'ye (Docker Registry) Giriş Yap
+    - name: Login to ACR
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.ACR_NAME }}.azurecr.io
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    # 6. Docker Build ve Push
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:v1 .
+        docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:v1
+      working-directory: ${{ env.SERVICE_PATH }}
+
+    # 7. AKS'ye Bağlan (kubectl kullanmak için)
+    - name: Set AKS Context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: ${{ env.RESOURCE_GROUP }}
+        cluster-name: ${{ env.CLUSTER_NAME }}
+
+    # 8. Podları Yeniden Başlat (Güncel İmajı Çekmesi İçin)
+    - name: Rollout Restart Deployment
+      run: |
+        kubectl rollout restart deployment ${{ env.IMAGE_NAME }}
