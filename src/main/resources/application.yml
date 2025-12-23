@@ -11,6 +11,8 @@ logging:
     console: '%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%-5level) %clr([%X{traceId}]){yellow} %clr(%logger{36}){cyan} - %msg%n'
 
 security:
+  cvv-encryption:
+    secret-key: ${SECURITY_CVV_ENCRYPTION_SECRET_KEY}
   encryption:
     secret-key: ${SECURITY_ENCRYPTION_SECRET_KEY}
 

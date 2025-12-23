@@ -26,9 +26,11 @@ public class BeforeAccountControllerAspect {
                 String userId = headerService.extractUserId();
                 String userRole = headerService.extractUserRole();
                 String userEmail = headerService.extractUserEmail();
+                String correlationId = headerService.extractCorrelationId();
                 baseRequest.setUserId(userId);
                 baseRequest.setUserRole(userRole);
                 baseRequest.setUserEmail(userEmail);
+                baseRequest.setCorrelationId(correlationId);
             }
         }
     }

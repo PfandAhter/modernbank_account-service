@@ -1,6 +1,7 @@
 package com.modernbank.account_service.rest.service.cache.account;
 
 import com.modernbank.account_service.api.dto.AccountDTO;
+import com.modernbank.account_service.entity.Account;
 import com.modernbank.account_service.repository.AccountRepository;
 import com.modernbank.account_service.rest.service.MapperService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,13 @@ public class AccountCacheServiceImpl implements IAccountCacheService {
     @Override
     public List<AccountDTO> getAccountsByUserId(String userId) {
         return mapperService.map(accountRepository.findAccountByUserId(userId), AccountDTO.class);
+    }
+
+    @Override
+    @CacheEvict(value = "account", key = "#account.id")
+    public void updateAccount(Account account) {
+        accountRepository.save(account);
+        log.info("Updated account for userId={} and evicted cache entry.", account.getId());
     }
 
     @CacheEvict(value = "account", allEntries = true)

@@ -28,42 +28,52 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<BaseResponse> handleException(NotFoundException e,HttpServletRequest request){
+    public ResponseEntity<BaseResponse> handleException(NotFoundException e, HttpServletRequest request) {
         logError(e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createErrorResponseBody(e,request));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createErrorResponseBody(e, request));
     }
 
     @ExceptionHandler(ErrorCodesNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    public ResponseEntity<BaseResponse> handleException(ErrorCodesNotFoundException e,HttpServletRequest request){
+    public ResponseEntity<BaseResponse> handleException(ErrorCodesNotFoundException e, HttpServletRequest request) {
         logError(e);
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(createErrorResponseBody(e,request));
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(createErrorResponseBody(e, request));
+    }
+
+    @ExceptionHandler(AccountBlockedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<BaseResponse> handleAccountBlockedException(AccountBlockedException e,
+            HttpServletRequest request) {
+        log.warn("Account blocked: IBAN={}, blockedUntil={}", e.getIban(), e.getBlockedUntil());
+        BaseResponse response = new BaseResponse("BLOCKED", "ACCOUNT_BLOCKED", e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    public ResponseEntity<BaseResponse> handleException(Exception e,HttpServletRequest request){
+    public ResponseEntity<BaseResponse> handleException(Exception e, HttpServletRequest request) {
         logError(e);
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(createErrorResponseBody(e,request));
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(createErrorResponseBody(e, request));
     }
 
-    //TODO: Buraya HTTPSTATUS kodlarini da parametre servisine loglama icin gondermesini sagliyalim...
-    private BaseResponse createErrorResponseBody(Exception exception, HttpServletRequest request){
+    // TODO: Buraya HTTPSTATUS kodlarini da parametre servisine loglama icin
+    // gondermesini sagliyalim...
+    private BaseResponse createErrorResponseBody(Exception exception, HttpServletRequest request) {
         ErrorCodes errorCodes = getErrorCodeByErrorId(exception.getMessage());
-        logError(exception,request.getHeader("X-User-Id"));
+        logError(exception, request.getHeader("X-User-Id"));
 
         return new BaseResponse("FAILED", errorCodes.getError(), errorCodes.getDescription());
     }
 
-    private ErrorCodes getErrorCodeByErrorId(String code){
+    private ErrorCodes getErrorCodeByErrorId(String code) {
         return errorCacheService.getErrorCodeByErrorId(code);
     }
 
-    private void logError(Exception exception, String userId){
-        try{
+    private void logError(Exception exception, String userId) {
+        try {
             LogErrorRequest request = LogErrorRequest.builder()
                     .errorCode(exception.getMessage())
-                                        .serviceName("account-service")
+                    .serviceName("account-service")
                     .timestamp(LocalDateTime.now().toString())
                     .stackTrace(exception.getStackTrace().toString())
                     .exceptionName(exception.getClass().getName())
@@ -71,12 +81,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
             request.setUserId(userId);
             parameterServiceClient.logError(request);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error log process failed " + e.getMessage());
         }
     }
 
-    private void logError(Exception exception){
+    private void logError(Exception exception) {
         log.error("Error: " + exception.getMessage());
     }
 }
