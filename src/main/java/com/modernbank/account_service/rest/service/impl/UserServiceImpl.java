@@ -7,6 +7,7 @@ import com.modernbank.account_service.exception.BusinessException;
 import com.modernbank.account_service.exception.NotFoundException;
 import com.modernbank.account_service.model.GetUserModel;
 import com.modernbank.account_service.model.SavedAccountModel;
+import com.modernbank.account_service.model.UserDetailsModel;
 import com.modernbank.account_service.model.enums.Role;
 import com.modernbank.account_service.repository.SavedAccountRepository;
 import com.modernbank.account_service.repository.UserRepository;
@@ -205,5 +206,22 @@ public class UserServiceImpl implements UserService {
         }
 
         return mapperService.map(savedAccounts, SavedAccountModel.class);
+    }
+
+    @Override
+    public UserDetailsModel getUserDetailsByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
+
+        return UserDetailsModel.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .enabled(user.isEnabled())
+                .accountNonExpired(user.isAccountNonExpired())
+                .accountNonLocked(user.isAccountNonLocked())
+                .credentialsNonExpired(user.isCredentialsNonExpired())
+                .roles(user.getAuthorities())
+                .build();
     }
 }

@@ -3,6 +3,7 @@ package com.modernbank.account_service.rest.service;
 import com.modernbank.account_service.api.request.*;
 import com.modernbank.account_service.model.GetUserModel;
 import com.modernbank.account_service.model.SavedAccountModel;
+import com.modernbank.account_service.model.UserDetailsModel;
 
 import java.util.List;
 
@@ -19,4 +20,6 @@ public interface UserService {
     void removeSavedAccount(RemoveSavedAccountRequest request);
 
     List<SavedAccountModel> getSavedAccounts(GetSavedAccountsRequest request);
+
+    UserDetailsModel getUserDetailsByEmail(String email);
 }

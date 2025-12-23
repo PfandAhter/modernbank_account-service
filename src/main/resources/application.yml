@@ -6,21 +6,29 @@ cache:
     cleanup:
       rate: 43200000 # 12 hours
 
+logging:
+  pattern:
+    console: '%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%-5level) %clr([%X{traceId}]){yellow} %clr(%logger{36}){cyan} - %msg%n'
+
+security:
+  encryption:
+    secret-key: ${SECURITY_ENCRYPTION_SECRET_KEY}
+
 spring:
   application:
     name: account-service
   data:
   datasource:
-    url: jdbc:mysql://localhost:3306/modern_bank_account_service
-    username: springstudent
-    password: springstudent
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
   cache:
     type: redis
     redis:
-      host: localhost
+      host: ${REDIS_HOST}
       port: 6379
   main:
     banner-mode: off
@@ -31,11 +39,11 @@ server:
 feign:
   client:
     email-service:
-      url: http://localhost:8087/api/v1/email
+      url: ${EMAIL_SERVICE_URL:http://localhost:8087}/api/v1
       verifyUser: /user/verify
       passwordReset: /user/password-reset
     parameter-service:
-      url: http://localhost:8086/api/v1
+      url: ${PARAMETER_SERVICE_URL:http://localhost:8086}/api/v1
       getByCode: /error-codes/error-code
       logError: /log/error
       getAllErrorCodes: /error-codes/error-code/all
