@@ -3,10 +3,12 @@ package com.modernbank.account_service.rest.controller;
 import com.modernbank.account_service.api.UserControllerApi;
 import com.modernbank.account_service.api.dto.GetUserDTO;
 import com.modernbank.account_service.api.dto.SavedAccountDTO;
+import com.modernbank.account_service.api.dto.UserDetailsDTO;
 import com.modernbank.account_service.api.request.*;
 import com.modernbank.account_service.api.response.BaseResponse;
 import com.modernbank.account_service.api.response.GetSavedAccountsResponse;
 import com.modernbank.account_service.api.response.GetUserInfoResponse;
+import com.modernbank.account_service.api.response.UserDetailsResponse;
 import com.modernbank.account_service.rest.service.MapperService;
 import com.modernbank.account_service.rest.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,5 +65,10 @@ public class UserServiceController implements UserControllerApi {
         updateUserInfoRequest.setUserId(request.getHeader("X-User-Id"));
         userService.updateUserInfo(updateUserInfoRequest);
         return new BaseResponse("Update User Info Success");
+    }
+
+    @Override
+    public UserDetailsResponse getUserAuthDetails(String email) {
+        return new UserDetailsResponse(mapperService.map(userService.getUserDetailsByEmail(email), UserDetailsDTO.class));
     }
 }
