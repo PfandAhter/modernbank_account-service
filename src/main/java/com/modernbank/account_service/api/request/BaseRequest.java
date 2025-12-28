@@ -25,4 +25,7 @@ public class BaseRequest {
 
     @JsonIgnore
     private String userEmail;
+
+    @JsonIgnore
+    private String correlationId;
 }

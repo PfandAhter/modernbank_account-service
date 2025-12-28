@@ -7,6 +7,7 @@ import com.modernbank.account_service.entity.ErrorCodes;
 import com.modernbank.account_service.rest.service.MapperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -59,15 +60,17 @@ public class ErrorCacheServiceImpl implements ErrorCacheService {
                 redisTemplate.opsForValue().set(cacheKey, errorCode);
             });
         } catch (Exception e) {
-            log.error("Error refreshing error codes cache, keeping existing cache.", e);
+            log.error("Error refreshing error codes cache, keeping existing cache.");
         }
     }
 
     private ErrorCodes handleErrorGetFailed(String code){
+        String traceId = MDC.get("traceId");
         return ErrorCodes.builder()
-                .id(code)
-                .error("Not Found")
-                .description("The requested resource was not found")
+                .id(code != null ? code : "UNKNOWN")
+                .error("Sistem Hatası")
+                .description("Beklenmeyen bir hata oluştu. Lütfen destek ekibiyle iletişime geçin. Takip Numarasi: " + traceId)
+                .httpStatus(500)
                 .build();
     }
 }
