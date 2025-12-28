@@ -20,7 +20,7 @@ public class CacheScheduler {
             accountCacheService.refreshAccountsByUserId();
             log.info("Accounts cache refreshed successfully");
         }catch (Exception e){
-            log.error("Error occurred while refreshing accounts cache", e);
+            log.error("Error occurred while refreshing accounts cache");
         }
     }
 }

@@ -36,5 +36,11 @@ public class CardModel {
 
     private LocalDateTime createdDate;
 
+    private String lastFourDigits;
+
+    private Double limitAmount;
+
+    private Double availableAmount;
+
     private LocalDateTime updatedDate;
 }

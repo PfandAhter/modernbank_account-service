@@ -15,8 +15,8 @@ public class CvvEncryptionServiceImpl implements CvvEncryptionService {
 
     private static final String ALGORITHM = "AES";
 
-    @Value("${app.security.cvv-encryption-key}")
-    private String encryptionKey; // application.yml'de 16 karakter key
+    @Value("${security.cvv-encryption.secret-key}")
+    private String encryptionKey;
 
     @Override
     public String encrypt(String rawCvv) {
@@ -27,8 +27,8 @@ public class CvvEncryptionServiceImpl implements CvvEncryptionService {
             byte[] encrypted = cipher.doFinal(rawCvv.getBytes());
             return Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception e) {
-            log.error("CVV encryption failed", e);
-            throw new RuntimeException("Encryption failed", e);
+            log.error("CVV encryption failed");
+            throw new RuntimeException("Encryption failed"); //TODO: Custom Exception FIX THIS
         }
     }
 
@@ -42,8 +42,8 @@ public class CvvEncryptionServiceImpl implements CvvEncryptionService {
             byte[] decrypted = cipher.doFinal(decoded);
             return new String(decrypted);
         } catch (Exception e) {
-            log.error("CVV decryption failed", e);
-            throw new RuntimeException("Decryption failed", e);
+            log.error("CVV decryption failed");
+            throw new RuntimeException("Decryption failed"); //TODO: Custom Exception FIX THIS
         }
     }
 }

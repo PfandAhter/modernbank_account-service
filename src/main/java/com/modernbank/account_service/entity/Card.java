@@ -35,21 +35,30 @@ public class Card {
     @Column(name = "raw_cvv_encrypted")
     private String rawCvvEncrypted;
 
+    @Column(name = "last_four_digits", length = 4)
+    private String lastFourDigits;
+
+    @Column(name = "card_number_encrypted")
+    private String cardNumberEncrypted;
+
+    @Column(name = "card_number_hash", unique = true)
+    private String cardNumberHash;
+
     @Column(name = "cvv")
     private String cvv;
 
     @Column(name = "expiry_date")
     private LocalDateTime expiryDate;
 
-    @Column(name = "card_type")
+    @Column(name = "card_type", length = 50)
     @Enumerated(EnumType.STRING)
     private CardType type;
 
-    @Column(name = "status")
+    @Column(name = "status", length = 50)
     @Enumerated(EnumType.STRING)
     private CardStatus status;
 
-    @Column(name = "network")
+    @Column(name = "network", length = 50)
     @Enumerated(EnumType.STRING)
     private CardNetwork network;
 
