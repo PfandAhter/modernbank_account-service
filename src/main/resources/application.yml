@@ -41,7 +41,7 @@ server:
 feign:
   client:
     email-service:
-      url: ${EMAIL_SERVICE_URL:http://localhost:8087}/api/v1
+      url: ${EMAIL_SERVICE_URL:http://localhost:8087}/api/v1/email
       verifyUser: /user/verify
       passwordReset: /user/password-reset
       cardApprove: /card/approval

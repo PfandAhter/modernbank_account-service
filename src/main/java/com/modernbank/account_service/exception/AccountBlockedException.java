@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
  * activity.
  * The block is time-based and will automatically expire.
  */
+
+@Deprecated(since = "1.0.0")
 public class AccountBlockedException extends BusinessException {
 
     private final String iban;

@@ -79,4 +79,9 @@ public class ErrorCodeConstants {
     public static final String OTP_NOT_FOUND_OR_INVALID = "H0043";
 
     public static final String USER_ALREADY_EXISTS = "H0044";
+
+
+    public static final String SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE";
+
+    public static final String SYSTEM_ERROR = "SYSTEM_ERROR";
 }
