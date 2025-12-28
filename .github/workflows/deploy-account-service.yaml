@@ -38,8 +38,6 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        # Tenant ID'ni buraya ekleyebilirsin, ancak genellikle otomatik bulur.
-        tenant-id: 6bf2c465-3f48-4847-9f0f-f84b83764bd9
 
     # 5. ACR'ye (Docker Registry) Giriş Yap
     - name: Login to ACR
