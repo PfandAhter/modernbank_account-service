@@ -10,7 +10,7 @@ env:
   IMAGE_NAME: account-service
   CLUSTER_NAME: ataberk-bakirbank-aks-cluster
   RESOURCE_GROUP: ataberk-bakirbank-aks-cluster
-  SERVICE_PATH: account-service # Account servisinin klasör adı
+  SERVICE_PATH: .
 
 jobs:
   build-and-deploy:
