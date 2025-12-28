@@ -11,11 +11,13 @@ import com.modernbank.account_service.exception.BusinessException;
 import com.modernbank.account_service.exception.NotFoundException;
 import com.modernbank.account_service.model.CardModel;
 import com.modernbank.account_service.model.CreateCardModel;
+import com.modernbank.account_service.model.EncryptedCardData;
 import com.modernbank.account_service.model.enums.CardNetwork;
 import com.modernbank.account_service.model.enums.CardStatus;
 import com.modernbank.account_service.model.enums.CardType;
 import com.modernbank.account_service.repository.AccountRepository;
 import com.modernbank.account_service.repository.CardRepository;
+import com.modernbank.account_service.rest.service.CardNumberEncryptionService;
 import com.modernbank.account_service.rest.service.CardService;
 import com.modernbank.account_service.rest.service.CvvEncryptionService;
 import com.modernbank.account_service.util.CardNumberService;
@@ -48,6 +50,8 @@ public class CardServiceImpl implements CardService {
 
     private final CvvEncryptionService cvvEncryptionService;
 
+    private final CardNumberEncryptionService cardNumberEncryptionService;
+
     private final EmailServiceClient emailServiceClient;
 
     private static final SecureRandom random = new SecureRandom();
@@ -66,7 +70,10 @@ public class CardServiceImpl implements CardService {
 
     private CardModel mapCardToModel(Card card) {
         boolean isPending = card.getStatus() == CardStatus.PENDING_APPROVAL;
-        if(card.getIsEmailNotified().equals(Boolean.FALSE)){
+        if (card.getIsEmailNotified() == null ||
+                card.getIsEmailNotified().equals(Boolean.FALSE) &&
+                        card.getStatus().equals(CardStatus.ACTIVE)
+        ) {
             String rawCvv = cvvEncryptionService.decrypt(card.getRawCvvEncrypted());
             sendCardApprovalEmail(card, rawCvv);
         }
@@ -79,6 +86,9 @@ public class CardServiceImpl implements CardService {
                 .network(isPending ? null : card.getNetwork())
                 .type(card.getType())
                 .status(card.getStatus())
+                .lastFourDigits(isPending ? null : card.getLastFourDigits())
+                .limitAmount(isPending ? null : card.getLimitAmount())
+                .availableAmount(isPending ? null : card.getAvailableAmount())
                 .cvv(isPending ? "---" : "***")
                 .pendingApproval(isPending)
                 .build();
@@ -93,10 +103,13 @@ public class CardServiceImpl implements CardService {
         log.debug("createCardForAccount - start: accountId={}, userId={}",
                 account.getId(), user.getId());
 
-        int currentCardCount = account.getCards() != null ? account.getCards().size() : 0;
+        int currentCardCount = account.getCards() == null ? 0 :
+            (int) account.getCards().stream()
+                .filter(c -> c.getStatus() == CardStatus.ACTIVE || c.getStatus() == CardStatus.PENDING_APPROVAL)
+                .count();
 
         if (currentCardCount >= 3) {
-            throw new BusinessException("Bir hesaba en fazla 3 kart tanımlanabilir.");
+            throw new BusinessException("Bir hesaba en fazla 3 kart tanımlanabilir. Onay bekleyen kartlar dahil.");
         }
 
         String cardHolderName = buildCardHolderName(user);
@@ -144,10 +157,15 @@ public class CardServiceImpl implements CardService {
         Card card = findCardById(cardId);
         validatePendingApprovalStatus(card);
         String rawCvv = cvvEncryptionService.decrypt(card.getRawCvvEncrypted());
-        activateCard(card, approvedBy);
         setCardLimits(card);
 
-        sendCardApprovalEmail(card, rawCvv);
+        Boolean isEmailSended = sendCardApprovalEmail(card, rawCvv);
+        if (isEmailSended == false) {
+            //TODO: Burada tecchnic hata bastir ve kullaniciya teknik ariza nedeniyle mail gonderilemedi bilgisi verilecek
+            //TODO: Kart yaratildi ama mail gonderilemedigi icin onay durumuna dusmedi. SUPPORTREQUEST gonderilecek...
+            throw new BusinessException("");
+        }
+        activateCard(card, approvedBy);
 
         log.info("Card approved successfully: cardId={}", cardId);
     }
@@ -158,7 +176,7 @@ public class CardServiceImpl implements CardService {
     }
 
     private void validatePendingApprovalStatus(Card card) {
-        if (card.getStatus() != CardStatus.PENDING_APPROVAL) {
+        if (card.getStatus() != CardStatus.PENDING_APPROVAL && !card.getApprovedBy().equals("system-auto-approval")) {
             throw new IllegalStateException("Card is not in pending approval status");
         }
     }
@@ -168,7 +186,8 @@ public class CardServiceImpl implements CardService {
         card.setApprovedDate(LocalDateTime.now());
         card.setApprovedBy(approvedBy);
         card.setUpdatedDate(LocalDateTime.now());
-        card.setRawCvvEncrypted(null); cardRepository.save(card);
+        card.setRawCvvEncrypted(null);
+        cardRepository.save(card);
     }
 
     private void setCardLimits(Card card) {
@@ -180,25 +199,30 @@ public class CardServiceImpl implements CardService {
         cardRepository.save(card);
     }
 
-    private void sendCardApprovalEmail(Card card, String rawCvv) {
+    private boolean sendCardApprovalEmail(Card card, String rawCvv) {
         String userEmail = card.getAccount().getUser().getEmail();
+
+        String fullCardNumber = cardNumberEncryptionService.decryptCardNumber(card.getCardNumberEncrypted());
         try {
             emailServiceClient.sendCardApprovalNotification(CardApprovalEmailRequest.builder()
-                    .userEmail(userEmail)
-                    .cardHolderName(card.getCardHolderName())
-                    .cardNumber(maskCardNumber(card.getCardNumber()))
-                    .cvv(rawCvv)
-                    .expiryDate(card.getExpiryDate().toLocalDate().toString())
-                    .cardType(card.getType().toString())
-                    .cardNetwork(card.getNetwork().toString())
-                    .creditLimit(card.getLimitAmount())
-                    .build()
+                            .userEmail(userEmail)
+                            .cardHolderName(card.getCardHolderName())
+//                    .cardNumber(maskCardNumber(card.getCardNumber()))
+                            .cardNumber(fullCardNumber)
+                            .cvv(rawCvv)
+                            .expiryDate(card.getExpiryDate().toLocalDate().toString())
+                            .cardType(card.getType().toString())
+                            .cardNetwork(card.getNetwork().toString())
+                            .creditLimit(card.getLimitAmount())
+                            .build()
             );
             card.setIsEmailNotified(true);
             log.info("Card approval email sent to: {}", userEmail);
+            return true;
         } catch (Exception e) {
             card.setIsEmailNotified(false);
             log.error("Error while sending card approval email: {}", e.getMessage());
+            return false;
         }
     }
 
@@ -225,7 +249,8 @@ public class CardServiceImpl implements CardService {
         String userEmail = card.getAccount().getUser().getEmail();
         try {
             emailServiceClient.sendCardRejectionNotification(CardRejectionEmailRequest.builder()
-                    .userEmail(userEmail) .cardHolderName(card.getCardHolderName())
+                    .userEmail(userEmail)
+                    .cardHolderName(card.getCardHolderName())
                     .cardType(card.getType().toString())
                     .applicationDate(card.getCreatedDate().toString())
                     .rejectionReason(reason)
@@ -278,12 +303,18 @@ public class CardServiceImpl implements CardService {
         String hashedCvv = passwordEncoder.encode(rawCvv);
         String encryptedCvv = cvvEncryptionService.encrypt(rawCvv);
 
+        String fullCardNumber = cardNumberService.generateUniqueCardNumber(
+                CardNetwork.valueOf(model.getCardNetwork()));
+
+        EncryptedCardData encryptedCardData = cardNumberEncryptionService.encryptCardNumber(fullCardNumber);
+
         Card card = Card.builder()
                 .cardHolderName(model.getCardHolderName())
                 .type(CardType.valueOf(model.getCardType()))
                 .network(CardNetwork.valueOf(model.getCardNetwork()))
-                .cardNumber(cardNumberService.generateUniqueCardNumber(
-                        CardNetwork.valueOf(model.getCardNetwork())))
+                .lastFourDigits(encryptedCardData.getLastFourDigits())
+                .cardNumberEncrypted(encryptedCardData.getEncryptedFullNumber())
+                .cardNumberHash(encryptedCardData.getCardNumberHash())
                 .expiryDate(calculateExpiryDate())
                 .status(CardStatus.PENDING_APPROVAL)
                 .account(model.getAccount())

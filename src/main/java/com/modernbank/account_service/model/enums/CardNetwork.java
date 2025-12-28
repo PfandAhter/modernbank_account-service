@@ -5,7 +5,7 @@ public enum CardNetwork {
     VISA("427922", 16),
     MASTERCARD("527922", 16),
     TROY("927922", 16),
-    AMERICAN_EXPRESS("327922", 15);
+    AMEX("327922", 15);
 
     private final String binPrefix;
     private final int length;

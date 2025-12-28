@@ -41,14 +41,14 @@ server:
 feign:
   client:
     email-service:
-      url: ${EMAIL_SERVICE_URL:http://localhost:8087}/api/v1/email
+      url: ${EMAIL_SERVICE_URL}/api/v1/email
       verifyUser: /user/verify
       passwordReset: /user/password-reset
       cardApprove: /card/approval
       cardPending: /card/pending
       cardReject: /card/rejection
     parameter-service:
-      url: ${PARAMETER_SERVICE_URL:http://localhost:8086}/api/v1
+      url: ${PARAMETER_SERVICE_URL}/api/v1
       getByCode: /error-codes/error-code
       logError: /log/error
       getAllErrorCodes: /error-codes/error-code/all

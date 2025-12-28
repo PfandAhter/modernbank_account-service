@@ -17,7 +17,10 @@ public interface CardRepository extends JpaRepository<Card, String> {
 
     boolean existsByCardNumber(String cardNumber);
 
-    @Query("SELECT c FROM Card c WHERE c.account.user.id = ?1 AND c.account.id = ?2") //TODO: BU PATLAYACAK BUYUK IHTIMALLE LAZY INIT DEN DOLAYI...
+    /*@Query("SELECT c FROM Card c WHERE c.account.user.id = ?1 AND c.account.id = ?2")
+    Optional<List<Card>> getCardsByUserIdAndAccountId(String userId, String accountId);*/
+
+    @Query("SELECT c FROM Card c WHERE c.account.user.id = ?1 AND (?2 = 'ALL' OR c.account.id = ?2)")
     Optional<List<Card>> getCardsByUserIdAndAccountId(String userId, String accountId);
 
     @Query("SELECT c FROM Card c WHERE c.cardNumber = ?1 AND c.account.user.id = ?2")

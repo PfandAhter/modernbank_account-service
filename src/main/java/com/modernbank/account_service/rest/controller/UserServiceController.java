@@ -71,4 +71,10 @@ public class UserServiceController implements UserControllerApi {
     public UserDetailsResponse getUserAuthDetails(String email) {
         return new UserDetailsResponse(mapperService.map(userService.getUserDetailsByEmail(email), UserDetailsDTO.class));
     }
+
+    @Override
+    public BaseResponse adminUpdateUserRole(AdminUpdateUserRoleRequest request) {
+        userService.updateUserRole(request);
+        return new BaseResponse("User Role Updated Successfully");
+    }
 }

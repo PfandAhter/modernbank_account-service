@@ -19,7 +19,8 @@ public class CardDTO {
 
     private String expirationDate;
 
-    private String cvv;
+    @Deprecated(since = "1.0.0")
+    private String cvv; //TODO: Deprecated
 
     private LocalDateTime expiryDate;
 
@@ -28,6 +29,12 @@ public class CardDTO {
     private CardStatus status;
 
     private CardNetwork network;
+
+    private String lastFourDigits;
+
+    private Double limitAmount;
+
+    private Double availableAmount;
 
     private LocalDateTime createdDate;
 

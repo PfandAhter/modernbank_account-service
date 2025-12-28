@@ -10,8 +10,8 @@ env:
   # Kendi Azure kaynakların
   ACR_NAME: ataberkbulutacr
   IMAGE_NAME: account-service
-  CLUSTER_NAME: ataberk-aks-app-cluster
-  RESOURCE_GROUP: ataberk-aks-app-cluster_group
+  CLUSTER_NAME: ataberk-bakirbank-aks-cluster
+  RESOURCE_GROUP: ataberk-bakirbank-aks-cluster
   SERVICE_PATH: account-service # Account servisinin klasör adı
 
 jobs:

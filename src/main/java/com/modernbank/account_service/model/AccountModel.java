@@ -16,5 +16,13 @@ public class AccountModel {
 
     private double balance;
 
+    private String firstName;
+
+    private String userId;
+
+    private String secondName;
+
+    private String lastName;
+
     private Currency currency;
 }

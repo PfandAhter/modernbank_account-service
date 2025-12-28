@@ -19,6 +19,8 @@ public interface UserService {
 
     void removeSavedAccount(RemoveSavedAccountRequest request);
 
+    void updateUserRole(AdminUpdateUserRoleRequest request);
+
     List<SavedAccountModel> getSavedAccounts(GetSavedAccountsRequest request);
 
     UserDetailsModel getUserDetailsByEmail(String email);

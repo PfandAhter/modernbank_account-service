@@ -1,21 +1,28 @@
 package com.modernbank.account_service.rest.service.impl;
 
 import com.modernbank.account_service.api.request.GetAccountDetailsRequest;
+import com.modernbank.account_service.api.request.account.AddIBANBlackListRequest;
+import com.modernbank.account_service.api.request.account.RemoveIBANBlackListRequest;
+import com.modernbank.account_service.api.response.AccountProfileResponse;
+import com.modernbank.account_service.entity.*;
 import com.modernbank.account_service.exception.NotFoundException;
 import com.modernbank.account_service.model.AccountListModel;
 import com.modernbank.account_service.model.AccountModel;
+import com.modernbank.account_service.model.CreateCardModel;
+import com.modernbank.account_service.model.enums.CardNetwork;
+import com.modernbank.account_service.model.enums.CardType;
+import com.modernbank.account_service.repository.BlacklistRepository;
+import com.modernbank.account_service.repository.CardRepository;
 import com.modernbank.account_service.repository.UserRepository;
 import com.modernbank.account_service.api.request.CreateAccountRequest;
 import com.modernbank.account_service.api.response.BaseResponse;
-import com.modernbank.account_service.entity.Account;
-import com.modernbank.account_service.entity.Branch;
-import com.modernbank.account_service.entity.User;
 import com.modernbank.account_service.model.enums.AccountStatus;
 import com.modernbank.account_service.repository.AccountRepository;
 import com.modernbank.account_service.repository.BranchRepository;
 import com.modernbank.account_service.api.response.GetAccountByIBAN;
 import com.modernbank.account_service.api.response.GetAccountOwnerNameResponse;
 import com.modernbank.account_service.rest.service.AccountService;
+import com.modernbank.account_service.rest.service.CardService;
 import com.modernbank.account_service.rest.service.MapperService;
 import com.modernbank.account_service.rest.service.cache.account.IAccountCacheService;
 import com.modernbank.account_service.util.IbanGenerationService;
@@ -29,7 +36,9 @@ import static com.modernbank.account_service.constants.ErrorCodeConstants.ACCOUN
 import static com.modernbank.account_service.constants.ErrorCodeConstants.ACCOUNT_NOT_FOUND;
 
 import java.time.LocalDateTime;
-
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,16 +57,22 @@ public class AccountServiceImpl implements AccountService {
 
     private final MapperService mapperService;
 
+    private final CardService cardService;
+
+    private final CardRepository cardRepository;
+
+    private final BlacklistRepository blacklistRepository;
+
     @Override
     public BaseResponse createAccount(CreateAccountRequest request) {
-
+        log.info("Creating account for userId: {}", request.getUserId());
         Branch branch = branchRepository.findBranchById(request.getBranchId())
                 .orElseThrow(() -> new NotFoundException(BRANCH_NOT_FOUND));
 
         User user = userRepository.findByUserId(request.getUserId())
-                        .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
 
-        accountRepository.save(Account.builder()
+        Account account = Account.builder()
                 .iban(ibanGenerationService.generateUniqueIban())
                 .branch(branch)
                 .name(request.getName())
@@ -66,31 +81,26 @@ public class AccountServiceImpl implements AccountService {
                 .description(request.getDescription())
                 .currency(request.getCurrency())
                 .status(AccountStatus.ACTIVE)
+                .cards(new ArrayList<>())
                 .createdDate(LocalDateTime.now())
                 .updatedDate(LocalDateTime.now())
-                .build());
-
-        return new BaseResponse("Account created successfully");
-    }
-    /*public BaseResponse updateAccount(BaseRequest request){
-        Account account = accountRepository.findAccountById(request.getAccountId())
-                .orElseThrow(() -> new RuntimeException("Account not found")); //TODO: BURAYI CUSTOM EXCEPTION YAP...
-
-        account.setName(request.getName());
-        account.setDescription(request.getDescription());
-        account.setCurrency(request.getCurrency());
-        account.setStatus(request.getStatus());
+                .build();
 
         accountRepository.save(account);
 
-        return new BaseResponse(); //TODO: Burada constructorunun icerisine description verince calisicak sekilde duzenle...
-    }*/
+        cardService.createCardForAccount(CreateCardModel.builder()
+                .cardNetwork(CardNetwork.VISA.getBinPrefix())
+                .cardType(CardType.DEBIT.toString())
+                .account(account)
+                .build());
+        return new BaseResponse("Account created successfully");
+    }
 
     @Override
     public AccountListModel getAccountsByUser(String userId) {
+        log.info("Fetching accounts for userId: {}", userId);
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-//        accountCacheService.refreshAccountsByUserId(); //TODO: BUNLARI BIR UCA BAGLA DA DISARIDAN MUDAHELE EDILEBILIR SEKILDE OLSUN.
 
         return AccountListModel.builder()
                 .firstName(user.getFirstName())
@@ -102,27 +112,33 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountModel getAccountDetails(GetAccountDetailsRequest request) {
-        Account account = accountRepository.findAccountById(request.getAccountId())
-                .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND));
+        log.info("Getting account details for accountId: {}", request.getAccountId());
+        Account account = getAccountEntityById(request.getAccountId());
 
         return mapperService.map(account, AccountModel.class);
     }
 
     @Override
     public GetAccountByIBAN getAccountByIBAN(String iban) {
-        Account account = accountRepository.findAccountByIban(iban)
-                .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND_BY_IBAN));
+        log.info("Getting account details for IBAN: {}", iban);
+        Account account = getAccountEntityByIBAN(iban);
 
         User user = account.getUser();
-        /*
-        * 
-        * */
+
         String tckn = user.getTckn();
         if (tckn != null) {
-            int visible = Math.min(4, tckn.length());
-            String visiblePart = tckn.substring(0, visible);
-            String maskedRest = "*".repeat(Math.max(0, tckn.length() - visible));
-            tckn = visiblePart + maskedRest;
+            int length = tckn.length();
+            if (length > 4) {
+                int visibleStart = 2;
+                int visibleEnd = 2;
+                String start = tckn.substring(0, visibleStart);
+                String end = tckn.substring(length - visibleEnd);
+                StringBuilder maskedMiddle = new StringBuilder();
+                for (int i = 0; i < length - visibleStart - visibleEnd; i++) {
+                    maskedMiddle.append('*');
+                }
+                tckn = start + maskedMiddle.toString() + end;
+            }
         }
 
         return GetAccountByIBAN.builder()
@@ -141,9 +157,22 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public AccountModel getAccountById(String accountId) {
+        Account account = getAccountEntityById(accountId);
+
+        AccountModel accountModel = mapperService.map(account, AccountModel.class);
+        User user = account.getUser();
+        accountModel.setFirstName(user.getFirstName());
+        accountModel.setSecondName(user.getSecondName());
+        accountModel.setLastName(user.getLastName());
+        accountModel.setUserId(user.getId());
+        return accountModel;
+    }
+
+    @Override
     public GetAccountOwnerNameResponse getAccountOwnerName(String iban) {
-        Account account = accountRepository.findAccountByIban(iban)
-                .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND));
+        log.info("Getting account owner name for IBAN: {}", iban);
+        Account account = getAccountEntityByIBAN(iban);
 
         User user = account.getUser();
 
@@ -154,15 +183,230 @@ public class AccountServiceImpl implements AccountService {
                 .build();
     }
 
+    @Override
     public BaseResponse updateBalance(String iban, double balance) {
-        Account account = accountRepository.findAccountByIban(iban)
-                .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND));
+        log.info("Updating balance for IBAN: {} with amount: {}", iban, balance);
+        Account account = getAccountEntityByIBAN(iban);
 
         account.setBalance(account.getBalance() + balance);
         account.setUpdatedDate(LocalDateTime.now());
 
         accountRepository.save(account);
 
+        try {
+            accountCacheService.updateAccount(account);
+        } catch (Exception e) {
+            log.warn("Failed to update account cache for iban {}: {}", iban, e.getMessage());
+        }
+
         return new BaseResponse("Balance updated successfully new amount:" + account.getBalance());
+    }
+
+    @Override
+    public AccountProfileResponse getAccountProfile(String accountId) {
+        log.info("Getting account profile for accountId: {}", accountId);
+        Account account = getAccountEntityById(accountId);
+
+        User user = account.getUser();
+
+        Integer accountAgeMonths = null;
+        if (account.getCreatedDate() != null) {
+            accountAgeMonths = (int) ChronoUnit.MONTHS.between(account.getCreatedDate(), LocalDateTime.now());
+        }
+
+        List<Card> cards = cardRepository.findByAccountId(account.getId());
+
+        if (cards.isEmpty()) {
+            return AccountProfileResponse.builder()
+                    .accountId(account.getId())
+                    .userId(user.getId())
+                    .iban(account.getIban())
+                    .accountName(account.getName())
+                    .accountAgeMonths(accountAgeMonths)
+                    .creditScore(account.getCreditScore())
+
+                    .currentBalance(account.getBalance())
+                    .previousFraudFlag(account.getPreviousFraudFlag() != null ? account.getPreviousFraudFlag() : false)
+                    .cardAgeMonths(0)
+                    .cardType("DEBIT")
+
+                    .previousFraudCount(account.getPreviousFraudCount() != null ? account.getPreviousFraudCount() : 0)
+                    .accountStatus(account.getStatus() != null ? account.getStatus().name() : null)
+                    .build();
+        }
+
+        Card firstCreatedCard = cards.stream()
+                .filter(c -> c != null && c.getCreatedDate() != null)
+                .min((c1, c2) -> c1.getCreatedDate().compareTo(c2.getCreatedDate()))
+                .orElse(null);
+
+        Integer cardAgeMonths = null;
+        if (firstCreatedCard != null && firstCreatedCard.getCreatedDate() != null) {
+            cardAgeMonths = (int) ChronoUnit.MONTHS.between(firstCreatedCard.getCreatedDate(), LocalDateTime.now());
+        }
+
+        return AccountProfileResponse.builder()
+                .accountId(account.getId())
+                .userId(user.getId())
+                .iban(account.getIban())
+                .accountName(account.getName())
+                .accountAgeMonths(accountAgeMonths)
+                .creditScore(account.getCreditScore())
+
+                .currentBalance(account.getBalance())
+                .previousFraudFlag(account.getPreviousFraudFlag())
+                .cardAgeMonths(cardAgeMonths)
+                .cardType(firstCreatedCard.getType().toString())
+
+                .previousFraudCount(account.getPreviousFraudCount() != null ? account.getPreviousFraudCount() : 0)
+                .accountStatus(account.getStatus() != null ? account.getStatus().name() : null)
+                .build();
+    }
+
+    @Override
+    public BaseResponse holdAccount(String accountId) {
+        log.info("Holding account with ID: {}", accountId);
+        Account account = getAccountEntityById(accountId);
+
+        account.setStatus(AccountStatus.HOLD);
+        account.setUpdatedDate(LocalDateTime.now());
+        accountRepository.save(account);
+
+        try {
+            accountCacheService.updateAccount(account);
+        } catch (Exception e) {
+            log.warn("Failed to update cache for held account {}: {}", accountId, e.getMessage());
+        }
+
+        log.info("Account {} has been put on HOLD status", accountId);
+        return new BaseResponse("Account has been put on hold due to suspicious activity");
+    }
+
+    @Override
+    public Boolean isReceiverBlacklisted(String iban) {
+        log.info("Checking if IBAN is blacklisted: {}", iban);
+        boolean isBlacklisted = blacklistRepository.existsByIbanAndIsActiveTrue(iban);
+        log.info("IBAN {} blacklist status: {}", iban, isBlacklisted);
+        return isBlacklisted;
+    }
+
+    private static final int FRAUD_COUNT_THRESHOLD = 3;
+    private static final int BLOCK_DURATION_HOURS = 24;
+
+    @Override
+    public Boolean validateAccountNotBlocked(String iban) {
+        log.info("Validating account not blocked for IBAN: {}", iban);
+        Account account = getAccountEntityByIBAN(iban);
+
+        LocalDateTime blockedUntil = account.getBlockedUntil();
+
+        if (blockedUntil != null && blockedUntil.isAfter(LocalDateTime.now())) {
+            log.warn("Account {} is blocked until {}", iban, blockedUntil);
+            return false;
+//            throw new AccountBlockedException(iban, blockedUntil);
+        }
+
+        log.info("Account {} is not blocked, operation allowed", iban);
+
+        return true;
+    }
+
+    @Override
+    public BaseResponse incrementFraudCount(String accountId, String reason) {
+        log.info("Incrementing fraud count for AccountId: {} , for this reason: {}", accountId, reason);
+        Account account = getAccountEntityById(accountId);
+
+        int currentCount = account.getPreviousFraudCount() != null ? account.getPreviousFraudCount() : 0;
+        int newCount = currentCount + 1;
+
+        log.info("Account {} fraud count: {} -> {}", accountId, currentCount, newCount);
+
+        account.setPreviousFraudFlag(true);
+
+        if (newCount >= FRAUD_COUNT_THRESHOLD) {
+            LocalDateTime blockUntil = LocalDateTime.now().plusHours(BLOCK_DURATION_HOURS);
+            account.setBlockedUntil(blockUntil);
+            account.setPreviousFraudCount(0);
+            account.setUpdatedDate(LocalDateTime.now());
+            account.setStatus(AccountStatus.BLOCKED);
+            account.setBlockedReason(reason);
+            accountRepository.save(account);
+
+            log.warn("Account {} has reached fraud threshold. Soft block applied until {}", account.getId(), blockUntil);
+
+            try {
+                accountCacheService.updateAccount(account);
+            } catch (Exception e) {
+                log.warn("Failed to update cache for blocked account {}: {}", account.getId(), e.getMessage());
+            }
+
+            return new BaseResponse(
+                    "Account temporarily blocked for " + BLOCK_DURATION_HOURS + " hours due to suspicious activity");
+        }
+
+        account.setPreviousFraudCount(newCount);
+        account.setUpdatedDate(LocalDateTime.now());
+        accountRepository.save(account);
+
+        try {
+            accountCacheService.updateAccount(account);
+        } catch (Exception e) {
+            log.warn("Failed to update cache for account {}: {}", account.getId(), e.getMessage());
+        }
+
+        return new BaseResponse("Fraud count incremented to " + newCount);
+    }
+
+    @Override
+    public void updatePreviousFraudFlag(String accountId, boolean flag) {
+        log.info("Updating previous fraud flag for AccountId: {} to {}", accountId, flag);
+        Account account = getAccountEntityById(accountId);
+
+        account.setPreviousFraudFlag(flag);
+        account.setUpdatedDate(LocalDateTime.now());
+        accountRepository.save(account);
+
+        try {
+            accountCacheService.updateAccount(account);
+        } catch (Exception e) {
+            log.warn("Failed to update cache for account {}: {}", account.getId(), e.getMessage());
+        }
+    }
+
+    @Override
+    public void addIBANBlackList(AddIBANBlackListRequest request) {
+        log.info("Adding IBAN to blacklist: {} by: {}", request.getIban(), request.getUserId());
+        blacklistRepository.save(Blacklist.builder()
+                .iban(request.getIban())
+                .reason(request.getReason())
+                .blacklistedBy(request.getUserId())
+                .removedDate(null)
+                .createdAt(LocalDateTime.now())
+                .isActive(true)
+                .build());
+    }
+
+    @Override
+    public void removeIBANBlackList(RemoveIBANBlackListRequest request) {
+        log.info("Removing IBAN from blacklist: {} by: {}", request.getIban(), request.getUserId());
+        Blacklist blacklist = blacklistRepository.findByIbanAndIsActiveTrue(request.getIban())
+                .orElseThrow(() -> new NotFoundException("Blacklist entry not found for IBAN: " + request.getIban())); //TODO: Generic exception with args.
+
+        blacklist.setIsActive(false);
+        blacklist.setRemovedBy(request.getUserId());
+        blacklist.setRemovedDate(LocalDateTime.now());
+
+        blacklistRepository.save(blacklist);
+    }
+
+
+    private Account getAccountEntityByIBAN(String iban){
+        return accountRepository.findAccountByIban(iban)
+                .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND_BY_IBAN));
+    }
+
+    private Account getAccountEntityById(String accountId){
+        return accountRepository.findAccountById(accountId)
+                .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND));
     }
 }
