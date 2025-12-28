@@ -3,9 +3,6 @@ name: Account Service CI/CD
 on:
   push:
     branches: [ "master" ]
-    paths:
-      - 'account-service/**' # Sadece bu klasör değiştiyse tetikle
-  workflow_dispatch:
 
 env:
   # Kendi Azure kaynakların
