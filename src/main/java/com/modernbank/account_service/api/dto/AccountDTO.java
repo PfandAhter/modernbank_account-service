@@ -17,5 +17,13 @@ public class AccountDTO {
 
     private double balance;
 
+    private String userId;
+
+    private String firstName;
+
+    private String secondName;
+
+    private String lastName;
+
     private Currency currency;
 }

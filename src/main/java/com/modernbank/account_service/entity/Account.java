@@ -1,12 +1,14 @@
 package com.modernbank.account_service.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.modernbank.account_service.model.enums.AccountStatus;
 import com.modernbank.account_service.model.enums.Currency;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "account")
@@ -56,4 +58,25 @@ public class Account {
 
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
+
+    @Column(name = "credit_score")
+    private Integer creditScore;
+
+    @Column(name = "previous_fraud_flag")
+    @Builder.Default
+    private Boolean previousFraudFlag = false;
+
+    @Column(name = "previous_fraud_count")
+    @Builder.Default
+    private Integer previousFraudCount = 0;
+
+    @Column(name = "blocked_until")
+    private LocalDateTime blockedUntil;
+
+    @Column(name = "blocked_reason")
+    private String blockedReason;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Card> cards;
 }

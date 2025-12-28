@@ -3,6 +3,8 @@ package com.modernbank.account_service.api;
 import com.modernbank.account_service.api.request.BaseRequest;
 import com.modernbank.account_service.api.request.CreateAccountRequest;
 import com.modernbank.account_service.api.request.GetAccountDetailsRequest;
+import com.modernbank.account_service.api.request.account.AddIBANBlackListRequest;
+import com.modernbank.account_service.api.request.account.RemoveIBANBlackListRequest;
 import com.modernbank.account_service.api.response.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +27,37 @@ public interface AccountControllerApi {
     @GetMapping(path = "/get-by-iban")
     ResponseEntity<GetAccountByIBAN> getAccountByIBAN(@RequestParam(value = "iban") String iban);
 
+    @GetMapping(path = "/get-by-accountId")
+    ResponseEntity<GetAccountByIdResponse> getAccountByAccountId(@RequestParam(value = "accountId") String accountId);
+
     @GetMapping(path = "/get/user/by-iban")
     ResponseEntity<GetAccountOwnerNameResponse> getAccountOwnerName(@RequestParam(value = "iban") String iban);
 
     @PostMapping(path = "/balance/update")
     ResponseEntity<BaseResponse> updateBalance(@RequestParam(value = "iban") String iban,
-                                    @RequestParam(value = "balance") double balance);
+            @RequestParam(value = "balance") double balance);
+
+    @GetMapping(path = "/profile")
+    ResponseEntity<AccountProfileResponse> getAccountProfileByAccountId(@RequestParam(value = "accountId") String accountId);
+
+    @PostMapping(path = "/hold")
+    ResponseEntity<BaseResponse> holdAccount(@RequestParam(value = "accountId") String accountId);
+
+    @GetMapping(path = "/blacklist/check")
+    ResponseEntity<Boolean> isReceiverBlacklisted(@RequestParam(value = "iban") String iban);
+
+    @GetMapping(path = "/blocked/check")
+    Boolean validateAccountNotBlocked(@RequestParam(value = "accountId") String accountId);
+
+    @PostMapping(path = "/fraud/confirm")
+    ResponseEntity<BaseResponse> incrementFraudCount(@RequestParam(value = "accountId") String accountId, @RequestParam(value = "reason") String reason);
+
+    @PostMapping(path = "/fraud/flag/update")
+    ResponseEntity<BaseResponse> updateFraudFlag(@RequestParam(value = "accountId") String accountId, @RequestParam(value = "isFraud") Boolean isFraud);
+
+    @PostMapping(path = "/admin/blacklist/add")
+    ResponseEntity<BaseResponse> addToBlacklist(@RequestBody AddIBANBlackListRequest addIBANBlackListRequest);
+
+    @PostMapping(path = "/admin/blacklist/remove")
+    ResponseEntity<BaseResponse> removeFromBlacklist(@RequestBody RemoveIBANBlackListRequest removeIBANBlackListRequest);
 }
