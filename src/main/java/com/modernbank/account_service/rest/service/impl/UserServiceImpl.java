@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.modernbank.account_service.constants.ErrorCodeConstants.*;
 
@@ -184,6 +185,21 @@ public class UserServiceImpl implements UserService {
 
         user.getSavedAccounts().remove(savedAccount);
         savedAccountRepository.delete(savedAccount);
+        user.setUpdatedDate(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updateUserRole(AdminUpdateUserRoleRequest request) {
+        log.info("Updating user role: userId={}, newRole={}", request.getUserIdInfo(), request.getRole());
+        User user = userRepository.findByUserId(request.getUserIdInfo())
+                .orElseThrow(() -> new NotFoundException("User not found with userId: " + request.getUserIdInfo())); // TODO: Burada ki gibi dynamic value olanlari baska bir sekilde handle edeyim.
+
+        Set<Role> newRoles = new HashSet<>();
+        newRoles.add(Role.valueOf(request.getRole()));
+
+        user.getAuthorities().clear();
+        user.setAuthorities(newRoles);
         user.setUpdatedDate(LocalDateTime.now());
         userRepository.save(user);
     }
