@@ -78,11 +78,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         try {
             ErrorCodes ec = errorCacheService.getErrorCodeByErrorId(code);
             if (ec != null) {
+                log.info("Fetched error code from cache by errorId {} , description: {}",ec.getError(), ec.getDescription());
                 return ec;
             }
         } catch (Exception ex) {
             log.error("Error cache service unreachable: {}", ex.getMessage());
         }
+        log.info("Returning default error code for code: {}", code);
 
         return ErrorCodes.builder()
                 .id(code != null ? code : "UNKNOWN")

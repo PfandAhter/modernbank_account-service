@@ -12,4 +12,6 @@ public class ErrorCodesDTO {
     private String error;
 
     private String description;
+
+    private Integer httpStatus;
 }
