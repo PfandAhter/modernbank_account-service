@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/cache")
+@RequestMapping("/api/v1/cache/admin")
 @RequiredArgsConstructor
 
 public class CacheServiceController implements CacheControllerApi {
@@ -32,5 +32,11 @@ public class CacheServiceController implements CacheControllerApi {
     public BaseResponse refreshDistrictCache(BaseRequest baseRequest) {
         cacheService.refreshDistrictCache();
         return new BaseResponse("District cache refreshed successfully");
+    }
+
+    @Override
+    public BaseResponse refreshErrorCodeCache(BaseRequest baseRequest) {
+        cacheService.refreshErrorCodesCache();
+        return new BaseResponse("Error code cache refreshed successfully");
     }
 }

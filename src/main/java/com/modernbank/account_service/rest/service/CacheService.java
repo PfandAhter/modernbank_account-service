@@ -7,4 +7,6 @@ public interface CacheService {
     void refreshCityCache();
 
     void refreshDistrictCache();
+
+    void refreshErrorCodesCache();
 }
