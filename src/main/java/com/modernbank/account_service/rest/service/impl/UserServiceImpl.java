@@ -9,6 +9,7 @@ import com.modernbank.account_service.model.GetUserModel;
 import com.modernbank.account_service.model.SavedAccountModel;
 import com.modernbank.account_service.model.UserDetailsModel;
 import com.modernbank.account_service.model.enums.Role;
+import com.modernbank.account_service.repository.AccountRepository;
 import com.modernbank.account_service.repository.SavedAccountRepository;
 import com.modernbank.account_service.repository.UserRepository;
 import com.modernbank.account_service.rest.service.MapperService;
@@ -34,6 +35,8 @@ import static com.modernbank.account_service.constants.ErrorCodeConstants.*;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
+    private final AccountRepository accountRepository;
 
     private final Pbkdf2PasswordEncoder passwordEncoder;
 
@@ -207,9 +210,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(AdminDeleteUserRequest request) {
         log.info("Deleting user: userId={}", request.getUserId());
+
         User user = userRepository.findByUserId(request.getUserId())
                 .orElseThrow(() -> new NotFoundException("User not found with userId: " + request.getUserId())); // TODO: Burada ki gibi dynamic value olanlari baska bir sekilde handle edeyim.
 
+        accountRepository.deleteAccountsByUserId(user.getId());
         userRepository.delete(user);
     }
 
