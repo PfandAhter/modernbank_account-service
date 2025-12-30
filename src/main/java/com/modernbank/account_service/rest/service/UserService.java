@@ -21,6 +21,8 @@ public interface UserService {
 
     void updateUserRole(AdminUpdateUserRoleRequest request);
 
+    void deleteUser(AdminDeleteUserRequest request);
+
     List<SavedAccountModel> getSavedAccounts(GetSavedAccountsRequest request);
 
     UserDetailsModel getUserDetailsByEmail(String email);

@@ -205,6 +205,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void deleteUser(AdminDeleteUserRequest request) {
+        log.info("Deleting user: userId={}", request.getUserId());
+        User user = userRepository.findByUserId(request.getUserId())
+                .orElseThrow(() -> new NotFoundException("User not found with userId: " + request.getUserId())); // TODO: Burada ki gibi dynamic value olanlari baska bir sekilde handle edeyim.
+
+        userRepository.delete(user);
+    }
+
+    @Override
     public List<SavedAccountModel> getSavedAccounts(GetSavedAccountsRequest request) {
         String userId = request.getUserId();
         String query = request.getQuery();

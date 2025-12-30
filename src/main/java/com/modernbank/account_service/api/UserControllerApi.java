@@ -37,6 +37,9 @@ public interface UserControllerApi {
     @GetMapping(path = "/auth-details")
     UserDetailsResponse getUserAuthDetails(@RequestParam(value = "email")String email);
 
-    @PostMapping(path = "/admi/update/role")
+    @PostMapping(path = "/admin/update/role")
     BaseResponse adminUpdateUserRole(@RequestBody AdminUpdateUserRoleRequest request);
+
+    @PostMapping(path = "/admin/delete/user")
+    BaseResponse adminDeleteUser(@RequestBody AdminDeleteUserRequest request);
 }
