@@ -3,6 +3,7 @@ package com.modernbank.account_service.rest.service.impl;
 import com.modernbank.account_service.rest.service.CacheService;
 import com.modernbank.account_service.rest.service.cache.account.IAccountCacheService;
 import com.modernbank.account_service.rest.service.cache.district.CityDistrictCacheService;
+import com.modernbank.account_service.rest.service.cache.error.ErrorCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ public class CacheServiceImpl implements CacheService {
     private final IAccountCacheService accountCacheService;
 
     private final CityDistrictCacheService cityDistrictCacheService;
+
+    private final ErrorCacheService errorCacheService;
 
     @Override
     public void refreshAccountCache() {
@@ -29,5 +32,10 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public void refreshDistrictCache() {
         cityDistrictCacheService.evictDistrictCacheValues();
+    }
+
+    @Override
+    public void refreshErrorCodesCache() {
+        errorCacheService.refreshAllErrorCodesCache();
     }
 }

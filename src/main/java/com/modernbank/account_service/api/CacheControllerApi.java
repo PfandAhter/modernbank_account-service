@@ -15,4 +15,7 @@ public interface CacheControllerApi {
 
     @PostMapping("/district/refresh")
     BaseResponse refreshDistrictCache(@RequestBody BaseRequest baseRequest);
+
+    @PostMapping("/errorcodes/refresh")
+    BaseResponse refreshErrorCodeCache(@RequestBody BaseRequest baseRequest);
 }
