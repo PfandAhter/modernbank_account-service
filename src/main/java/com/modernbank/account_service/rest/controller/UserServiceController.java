@@ -77,4 +77,10 @@ public class UserServiceController implements UserControllerApi {
         userService.updateUserRole(request);
         return new BaseResponse("User Role Updated Successfully");
     }
+
+    @Override
+    public BaseResponse adminDeleteUser(AdminDeleteUserRequest request) {
+        userService.deleteUser(request);
+        return new BaseResponse("User Deleted Successfully");
+    }
 }
