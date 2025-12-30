@@ -2,6 +2,7 @@ package com.modernbank.account_service.repository;
 
 import com.modernbank.account_service.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     @Query("SELECT a FROM Account a WHERE a.id = ?1")
     Optional<Account> findAccountById(String accountId);
 
+    @Modifying
     @Query("DELETE FROM Account a WHERE a.user.id = ?1")
     void deleteAccountsByUserId(String userId);
 }
