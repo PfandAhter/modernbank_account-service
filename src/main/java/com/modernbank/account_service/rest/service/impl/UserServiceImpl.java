@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -208,11 +209,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(AdminDeleteUserRequest request) {
-        log.info("Deleting user: userId={}", request.getUserId());
+        log.info("Deleting user: userId={}, by={}", request.getDeletedUserId(), request.getUserId());
 
-        User user = userRepository.findByUserId(request.getUserId())
-                .orElseThrow(() -> new NotFoundException("User not found with userId: " + request.getUserId())); // TODO: Burada ki gibi dynamic value olanlari baska bir sekilde handle edeyim.
+        User user = userRepository.findByUserId(request.getDeletedUserId())
+                .orElseThrow(() -> new NotFoundException("User not found with userId: " + request.getDeletedUserId())); // TODO: Burada ki gibi dynamic value olanlari baska bir sekilde handle edeyim.
 
         accountRepository.deleteAccountsByUserId(user.getId());
         userRepository.delete(user);
