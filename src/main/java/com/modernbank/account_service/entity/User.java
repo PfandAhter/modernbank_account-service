@@ -71,7 +71,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> authorities;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Account> accounts;
 

@@ -22,4 +22,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
     @Query("SELECT a FROM Account a WHERE a.id = ?1")
     Optional<Account> findAccountById(String accountId);
+
+    @Query("DELETE FROM Account a WHERE a.user.id = ?1")
+    void deleteAccountsByUserId(String userId);
 }
