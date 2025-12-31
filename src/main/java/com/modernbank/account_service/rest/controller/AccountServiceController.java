@@ -71,6 +71,12 @@ public class AccountServiceController implements AccountControllerApi {
         return ResponseEntity.ok(accountService.updateBalance(iban, balance));
     }
 
+    @Override
+    public ResponseEntity<BaseResponse> updateAccountLimit(String accountId, Double amount, String category) {
+        accountService.updateAccountLimit(accountId, amount, category);
+        return ResponseEntity.ok(new BaseResponse("Account limit updated successfully."));
+    }
+
     // Fraud detection endpoints
 
     @Override

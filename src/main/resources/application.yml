@@ -46,6 +46,11 @@ spring:
 server:
   port: 8084
 
+account:
+  daily-limit:
+    transfer: 50000.0
+    withdraw: 10000.0
+    deposit: 10000.0
 
 feign:
   client:

@@ -28,6 +28,8 @@ public interface AccountService {
 
     BaseResponse updateBalance(String iban, double balance);
 
+    void updateAccountLimit(String accountId, double amount, String category);
+
     AccountProfileResponse getAccountProfile(String accountId);
 
     BaseResponse holdAccount(String accountId);

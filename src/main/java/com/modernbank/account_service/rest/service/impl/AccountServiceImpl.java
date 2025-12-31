@@ -28,6 +28,8 @@ import com.modernbank.account_service.rest.service.cache.account.IAccountCacheSe
 import com.modernbank.account_service.util.IbanGenerationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import static com.modernbank.account_service.constants.ErrorCodeConstants.BRANCH_NOT_FOUND;
@@ -63,6 +65,15 @@ public class AccountServiceImpl implements AccountService {
 
     private final BlacklistRepository blacklistRepository;
 
+    @Value("${account.daily-limit.transfer:50000.0}")
+    private Double dailyTransferLimit;
+
+    @Value("${account.daily-limit.withdraw:10000.0}")
+    private Double dailyWithdrawLimit;
+
+    @Value("${account.daily-limit.deposit:10000.0}")
+    private Double dailyDepositLimit;
+
     @Override
     public BaseResponse createAccount(CreateAccountRequest request) {
         log.info("Creating account for userId: {}", request.getUserId());
@@ -79,9 +90,9 @@ public class AccountServiceImpl implements AccountService {
                 .balance(0.0)
                 .user(user)
                 .description(request.getDescription())
-                .dailyTransferLimit(50000.0)
-                .dailyWithdrawLimit(10000.0)
-                .dailyDepositLimit(10000.0)
+                .dailyTransferLimit(dailyTransferLimit)
+                .dailyWithdrawLimit(dailyWithdrawLimit)
+                .dailyDepositLimit(dailyDepositLimit)
                 .previousFraudCount(0)
                 .previousFraudFlag(false)
                 .currency(request.getCurrency())
@@ -208,6 +219,27 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return new BaseResponse("Balance updated successfully new amount:" + account.getBalance());
+    }
+
+    @Override
+    public void updateAccountLimit(String accountId, double amount, String category) {
+        log.info("Updating account limit for accountId: {} with amount: {} for category: {}", accountId, amount, category);
+        Account account = getAccountEntityById(accountId);
+
+        switch (category.toUpperCase()) {
+            case "TRANSFER":
+                account.setDailyTransferLimit(account.getDailyTransferLimit() - amount);
+                break;
+            case "WITHDRAWAL":
+                account.setDailyWithdrawLimit(account.getDailyWithdrawLimit() - amount);
+                break;
+            case "DEPOSIT":
+                account.setDailyDepositLimit(account.getDailyDepositLimit() - amount);
+                break;
+            default:
+                log.warn("Invalid category provided for account limit update: {}", category);
+                throw new IllegalArgumentException("Invalid category: " + category);
+        }
     }
 
     @Override
@@ -416,5 +448,24 @@ public class AccountServiceImpl implements AccountService {
     private Account getAccountEntityById(String accountId){
         return accountRepository.findAccountById(accountId)
                 .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND));
+    }
+
+    @Scheduled(cron = "0 0 0 * * *", zone = "Europe/Istanbul")
+    public void resetDailyLimitsJob() {
+        log.info("Günlük limit sıfırlama işlemi başladı...");
+
+        double defaultTransferLimit = dailyTransferLimit;
+        double defaultWithdrawLimit = dailyWithdrawLimit;
+        double defaultDepositLimit = dailyDepositLimit;
+
+        accountRepository.resetDailyLimits(defaultTransferLimit, defaultWithdrawLimit, defaultDepositLimit);
+
+        try {
+            accountCacheService.refreshAccountsByUserId();
+        } catch (Exception e) {
+            log.warn("Limit reset sonrası cache temizlenirken hata oluştu: {}", e.getMessage());
+        }
+
+        log.info("Tüm aktif hesapların günlük limitleri başarıyla sıfırlandı.");
     }
 }

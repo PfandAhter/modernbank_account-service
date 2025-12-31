@@ -29,4 +29,14 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     @Transactional
     @Query("DELETE FROM Account a WHERE a.user.id = ?1")
     void deleteAccountsByUserId(String userId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Account a SET a.dailyTransferLimit = :transferLimit, " +
+            "a.dailyWithdrawLimit = :withdrawLimit, " +
+            "a.dailyDepositLimit = :depositLimit " +
+            "WHERE a.status = 'ACTIVE'")
+    void resetDailyLimits(@Param("transferLimit") Double transferLimit,
+                          @Param("withdrawLimit") Double withdrawLimit,
+                          @Param("depositLimit") Double depositLimit);
 }
