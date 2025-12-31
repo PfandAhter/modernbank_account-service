@@ -48,9 +48,9 @@ server:
 
 account:
   daily-limit:
-    transfer: 50000.0
-    withdraw: 10000.0
-    deposit: 10000.0
+    transfer: ${DAILY_TRANSFER_LIMIT}
+    withdraw: ${DAILY_WITHDRAW_LIMIT}
+    deposit: ${DAILY_DEPOSIT_LIMIT}
 
 feign:
   client:
