@@ -82,6 +82,8 @@ public class AccountServiceImpl implements AccountService {
                 .dailyTransferLimit(50000.0)
                 .dailyWithdrawLimit(10000.0)
                 .dailyDepositLimit(10000.0)
+                .previousFraudCount(0)
+                .previousFraudFlag(false)
                 .currency(request.getCurrency())
                 .status(AccountStatus.ACTIVE)
                 .cards(new ArrayList<>())
@@ -300,19 +302,19 @@ public class AccountServiceImpl implements AccountService {
     private static final int BLOCK_DURATION_HOURS = 24;
 
     @Override
-    public Boolean validateAccountNotBlocked(String iban) {
-        log.info("Validating account not blocked for IBAN: {}", iban);
-        Account account = getAccountEntityByIBAN(iban);
+    public Boolean validateAccountNotBlocked(String accountId) {
+        log.info("Validating account not blocked for accountId: {}", accountId);
+        Account account = getAccountEntityById(accountId);
 
         LocalDateTime blockedUntil = account.getBlockedUntil();
 
         if (blockedUntil != null && blockedUntil.isAfter(LocalDateTime.now())) {
-            log.warn("Account {} is blocked until {}", iban, blockedUntil);
+            log.warn("Account {} is blocked until {}", accountId, blockedUntil);
             return false;
 //            throw new AccountBlockedException(iban, blockedUntil);
         }
 
-        log.info("Account {} is not blocked, operation allowed", iban);
+        log.info("Account {} is not blocked, operation allowed", accountId);
 
         return true;
     }
