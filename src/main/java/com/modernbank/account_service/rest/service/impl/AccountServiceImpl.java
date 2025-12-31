@@ -310,13 +310,13 @@ public class AccountServiceImpl implements AccountService {
 
         if (blockedUntil != null && blockedUntil.isAfter(LocalDateTime.now())) {
             log.warn("Account {} is blocked until {}", accountId, blockedUntil);
-            return false;
+            return true;
 //            throw new AccountBlockedException(iban, blockedUntil);
         }
 
         log.info("Account {} is not blocked, operation allowed", accountId);
 
-        return true;
+        return false;
     }
 
     @Override
