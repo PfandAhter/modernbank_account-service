@@ -28,6 +28,12 @@ public class GetAccountByIBAN extends BaseResponse{
 
     private double balance;
 
+    private Double dailyTransferLimit;
+
+    private Double dailyDepositLimit;
+
+    private Double dailyWithdrawLimit;
+
     private String lastName;
 
     private Currency currency;
