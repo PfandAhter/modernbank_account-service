@@ -75,8 +75,8 @@ public class Account {
     @Column(name = "daily_withdraw_limit")
     private Double dailyWithdrawLimit;
 
-    @Column(name = "daily_withdraw_and_deposit_limit")
-    private Double dailyWithdrawAndDepositLimit;
+    /*@Column(name = "daily_withdraw_and_deposit_limit")
+    private Double dailyWithdrawAndDepositLimit;*/ //TODO: Deprecated may be change it to atm deposit limit...
 
 
     @Column(name = "previous_fraud_count")
