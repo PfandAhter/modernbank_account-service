@@ -240,6 +240,9 @@ public class AccountServiceImpl implements AccountService {
                 log.warn("Invalid category provided for account limit update: {}", category);
                 throw new IllegalArgumentException("Invalid category: " + category);
         }
+
+        account.setUpdatedDate(LocalDateTime.now());
+        accountRepository.save(account);
     }
 
     @Override
