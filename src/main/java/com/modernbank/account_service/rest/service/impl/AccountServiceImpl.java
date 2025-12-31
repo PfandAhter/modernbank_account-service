@@ -458,7 +458,11 @@ public class AccountServiceImpl implements AccountService {
         double defaultWithdrawLimit = dailyWithdrawLimit;
         double defaultDepositLimit = dailyDepositLimit;
 
-        accountRepository.resetDailyLimits(defaultTransferLimit, defaultWithdrawLimit, defaultDepositLimit);
+        accountRepository.resetDailyLimits(defaultTransferLimit,
+                defaultWithdrawLimit,
+                defaultDepositLimit,
+                AccountStatus.ACTIVE
+        );
 
         try {
             accountCacheService.refreshAccountsByUserId();
