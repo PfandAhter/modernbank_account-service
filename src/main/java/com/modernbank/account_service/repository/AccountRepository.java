@@ -1,6 +1,7 @@
 package com.modernbank.account_service.repository;
 
 import com.modernbank.account_service.entity.Account;
+import com.modernbank.account_service.model.enums.AccountStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -35,8 +36,9 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     @Query("UPDATE Account a SET a.dailyTransferLimit = :transferLimit, " +
             "a.dailyWithdrawLimit = :withdrawLimit, " +
             "a.dailyDepositLimit = :depositLimit " +
-            "WHERE a.status = 'ACTIVE'")
+            "WHERE a.status = :status") // <--- DÜZELTME BURADA ('ACTIVE' yerine :status)
     void resetDailyLimits(@Param("transferLimit") Double transferLimit,
                           @Param("withdrawLimit") Double withdrawLimit,
-                          @Param("depositLimit") Double depositLimit);
+                          @Param("depositLimit") Double depositLimit,
+                          @Param("status") AccountStatus status);
 }
