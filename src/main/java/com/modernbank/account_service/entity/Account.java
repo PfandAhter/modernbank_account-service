@@ -66,6 +66,19 @@ public class Account {
     @Builder.Default
     private Boolean previousFraudFlag = false;
 
+    @Column(name = "daily_transfer_limit")
+    private Double dailyTransferLimit;
+
+    @Column(name = "daily_deposit_limit")
+    private Double dailyDepositLimit;
+
+    @Column(name = "daily_withdraw_limit")
+    private Double dailyWithdrawLimit;
+
+    @Column(name = "daily_withdraw_and_deposit_limit")
+    private Double dailyWithdrawAndDepositLimit;
+
+
     @Column(name = "previous_fraud_count")
     @Builder.Default
     private Integer previousFraudCount = 0;
