@@ -37,6 +37,13 @@ public interface AccountControllerApi {
     ResponseEntity<BaseResponse> updateBalance(@RequestParam(value = "iban") String iban,
             @RequestParam(value = "balance") double balance);
 
+    @PostMapping(path = "/limit/update")
+    ResponseEntity<BaseResponse> updateAccountLimit(
+            @RequestParam(value = "accountId") String accountId,
+            @RequestParam(value = "amount") Double amount,
+            @RequestParam(value = "category") String category
+    );
+
     @GetMapping(path = "/profile")
     ResponseEntity<AccountProfileResponse> getAccountProfileByAccountId(@RequestParam(value = "accountId") String accountId);
 
